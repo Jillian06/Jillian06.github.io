@@ -11,38 +11,40 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   extraCanvas = createGraphics(width, height);
   overlay = createGraphics(width, height);
+  colorA = color(random(255), random(255));
 }
 
 function draw() {
   background(0);
   mouseTrack();
-  mouseShape();
+  image(overlay, 0, 0);
   text('Jillian', 12, 12);
   textFont('Georgia');
   drawAndMoveBall();
 }
 
-//draw different shape
-function mouseShape() {
-  if (mouseIsPressed) {
-    if (key === "a") {
-      overlay.rect(mouseX, mouseY, 50, 25);
-    }
-    if (key === "s") {
-      overlay.ellipse(mouseX, mouseY, 30, 50);
-    }
-    if (key === "d") {
-      overlay.triangle(mouseX, mouseY, mouseX + 28, mouseY - 55, mouseX + 56, mouseY);
-    }
+let colorA;
+
+//Each click of the mouse and corresponding keyboard will draw different patterns in random colors. 
+function mousePressed() {
+  if (key === "a") {
+    overlay.rect(mouseX, mouseY, 50, 25);
   }
+  if (key === "s") {
+    overlay.ellipse(mouseX, mouseY, 30, 50);
+  }
+  if (key === "d") {
+    overlay.triangle(mouseX, mouseY, mouseX + 28, mouseY - 55, mouseX + 56, mouseY);
+  }
+  extraCanvas.fill(colorA);
   if (key === " ") {
     overlay.clear();
   }
-  image(overlay, 0, 0);
-  overlay.fill(random(255), random(255));
+  overlay.fill(colorA);
+  colorA = color(random(255), random(255));
 }
 
-//show the shape 
+//Clicking the mouse and corresponding keys on the keyboard will display the pattern to be drawn.
 function mouseTrack() {
   if (key === "a") {
     extraCanvas.rect(mouseX, mouseY, 50, 25);
@@ -54,7 +56,6 @@ function mouseTrack() {
     extraCanvas.triangle(mouseX, mouseY, mouseX + 28, mouseY - 55, mouseX + 56, mouseY);
   }
   image(extraCanvas, 0, 0);
-  extraCanvas.fill(random(255), random(255));
   extraCanvas.clear();
 }
 
