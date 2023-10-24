@@ -18,28 +18,61 @@ function draw() {
 
   //add push()  pop()
 
-  push();
-  translate(120, 120);
-  drawBasicGrid(150);
-  rectangleRed(0, 0);
+  // push();
+  // translate(120, 120);
+  // drawBasicGrid(150);
+  // rectangleRed(0, 0);
 
-  pop();
+  // pop();
+
+  // rectangleBlue(0, 0);
 
 
 
 
   //transformation two: SCALE
 
+  // push();
+  // rectMode(CORNER);
+  // rectangleRed(40, 0);
+  // // 1 - no change  <1 smaller 
 
+
+  // let scaleAmount = 2.5;
+  // translate(140, 140);
+  // scale(scaleAmount); //changes the size of a pixel
+  // drawBasicGrid(100);
+  // rectangleBlue(0, 0);
+
+
+  // pop();
 
 
   //transformation three: ROTATION
   //reminder: rotations are measured in radians, not degrees! Functions can help with the conversion...
- 
+  // push();
+  // rectangleRed(20, 20);
+
+  // translate(140, 140);
+  // face(0, 0);
+  // rotate(radians(frameCount)); //always origin
+  // //drawBasicGrid(100);
+  // rectangleBlue(frameCount/5, 0);
+  // rectangleRed(100, 0);
+
+
+  // pop();
 
 
   //Combinations of Transformations
+  //"The order matters"
+  push();
+  scale(5);
+  translate(100, 100);
+  rotate(radians(45));
+  face(0, 0);
 
+  pop();
   
 
 }
