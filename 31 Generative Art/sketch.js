@@ -12,37 +12,40 @@ let imge1, imge2, imge3, imge4, imge5;
 let currentCentImage;
 
 let backgroundMusic;
+let started = false;
 
 function preload() {
-  imgOne = loadImage('assets/IMG_0986.jpg');
-  imgTwo = loadImage('assets/IMG_0987.jpg');
-  imgThree = loadImage('assets/IMG_0988.jpg');
-  imgFour = loadImage('assets/IMG_0989.jpg');
-  imgFive = loadImage('assets/IMG_0990.jpg');
-  imge1 = loadImage('assets/IMG_0994.jpg');
-  imge2 = loadImage('assets/IMG_0995.jpg');
-  imge3 = loadImage('assets/IMG_0996.jpg');
-  imge4 = loadImage('assets/IMG_0997.jpg');
-  imge5 = loadImage('assets/IMG_0998.jpg');
+  imgOne = loadImage("assets/IMG_0986.jpg");
+  imgTwo = loadImage("assets/IMG_0987.jpg");
+  imgFour = loadImage("assets/IMG_0989.jpg");
+  imgFive = loadImage("assets/IMG_0990.jpg");
+  imge1 = loadImage("assets/IMG_0994.jpg");
+  imge2 = loadImage("assets/IMG_0995.jpg");
+  imge3 = loadImage("assets/IMG_0996.jpg");
+  imge4 = loadImage("assets/IMG_0997.jpg");
+  imge5 = loadImage("assets/IMG_0998.jpg");
 
-  //backgroundMusic = loadSound('music/Weathering with You 1.m4a');
+  backgroundMusic = loadSound("music/Weathering with You.mp3");
 }
 
 
 function setup() {
   createCanvas(2000, 2000);
-  //backgroundMusic.play();
   for (let i = 0; i < 400; i++) {
     stars[i] = new Star();
   }
   for (let i = 0; i < 200; i++) {
     starsCent[i] = new StarCent();
   }
+
   currentImage = imgOne;
   currentCentImage = imge1;
 }
 
 function draw() {
+  textSize(50); 
+  textAlign(TOP);
+
   background(0);
   for (let star of stars) {
     star.display();
@@ -63,8 +66,19 @@ function draw() {
   if (frameCount % 2 === 1) {
     switchCentImage();
   }
+
+  if(started === false){
+    fill(180);
+    text("click to start music", 10, 60);
+    if (mouseIsPressed) {
+      started = true;
+      backgroundMusic.setVolume(0.3);
+      backgroundMusic.loop(); 
+    }
+  }
 }
 
+// Change the photo to give the picture the feeling of falling wind
 function switchImage() {
   let randomNumber = floor(random(1, 6));
   if (randomNumber === 1) {
@@ -72,9 +86,6 @@ function switchImage() {
   }
   else if (randomNumber === 2) {
     currentImage = imgTwo;
-  }
-  else if (randomNumber === 3) {
-    currentImage = imgThree;
   }
   else if (randomNumber === 4) {
     currentImage = imgFour;
@@ -84,6 +95,7 @@ function switchImage() {
   }
 }
 
+// Stars around angel in background with twinkling feature
 class Star {
   constructor() {
     this.x = random(width);
@@ -113,6 +125,7 @@ class Star {
   }
 }
 
+// Star in center above angel in background
 class StarCent {
   constructor() {
     this.x = random(700, width - 700);
@@ -142,6 +155,7 @@ class StarCent {
   }
 }
 
+// The star in the center above the angel in the background is transformed by the picture
 function switchCentImage() {
   let randomNumber = floor(random(1, 6));
   if (randomNumber === 1) {
