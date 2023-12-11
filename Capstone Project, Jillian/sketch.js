@@ -13,11 +13,13 @@ function draw() {
   clear();
   // pressStart();
   animation(gameStart, 1194, 834);
-  animation.time(3);
   pressStart();
 }
 
 function pressStart(){
+  // if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+  //   timer --;
+  // }
   textSize(60);
   fill(255);
   stroke(0);
