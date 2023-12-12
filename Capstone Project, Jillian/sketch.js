@@ -4,6 +4,7 @@
 
 let gameStart;
 // let starter = 8;
+let ifGameStart = false;
 let runFront, runFrontMask, runLeft, runLeftMask, runRight, runRightMask, runBack;
 
 function setup() {
@@ -25,13 +26,17 @@ function loadplayerRun(){
 function draw() {
   clear();
   // pressStart();
-  animation(gameStart, 1194, 834);
-  pressStart();
-  playerRun();
+  if(ifGameStart === false){
+    animation(gameStart, 1194, 834);
+    pressStart();
+  }
+  else{
+    playerRun();
+  }
 }
 
 function playerRun(){
-  if(keyIsPressed === true && keyCode === SHIFT){
+  if(keyIsPressed === true && keyCode === ENTER){
     clear();
     animation(runFrontMask, 100, 100);
   }
@@ -63,8 +68,14 @@ function pressStart(){
   stroke(0);
   strokeWeight(4);
   text('Press ENTER to Start the Game', 1350, 1660);
-  if(keyIsPressed === true && keyCode === ENTER){
+  if(ifGameStart === true){
     gameBegin();
+  }
+}
+
+function keyPressed(){
+  if(ifGameStart === false && keyCode === ENTER){
+    ifGameStart = true;
   }
 }
 
