@@ -6,6 +6,7 @@ let gameStart;
 // let starter = 8;
 let ifGameStart = false;
 let runFront, runFrontMask, runLeft, runLeftMask, runRight, runRightMask, runBack;
+let gameMap;
 
 function setup() {
   createCanvas(2388, 1668);
@@ -26,35 +27,35 @@ function loadplayerRun(){
 function draw() {
   clear();
   // pressStart();
-  if(ifGameStart === false){
-    animation(gameStart, 1194, 834);
-    pressStart();
-  }
-  else{
-    playerRun();
-  }
+  // if(ifGameStart === false){
+  animation(gameStart, 1194, 834);
+  pressStart();
+  // }
+  // else{
+  playerRun();
+  // }
 }
 
 function playerRun(){
   if(keyIsPressed === true && keyCode === ENTER){
-    clear();
-    animation(runFrontMask, 100, 100);
+    scale(0.3);
+    animation(runFrontMask, 2500, 2500);
   }
   if(keyIsPressed === true && keyCode === DOWN_ARROW){
-    clear();
-    animation(runFront, 100, 100);
+    scale(0.3);
+    animation(runFront, 2500, 2500);
   }
   else if(keyIsPressed === true && keyCode === UP_ARROW){
-    clear();
-    animation(runBack, 100, 100);
+    scale(0.3);
+    animation(runBack, 2500, 2500);
   }
   else if(keyIsPressed === true && keyCode === LEFT_ARROW){
-    clear();
-    animation(runLeft, 100, 100);
+    scale(0.3);
+    animation(runLeft, 2500, 2500);
   }
   else if(keyIsPressed === true && keyCode === RIGHT_ARROW){
-    clear();
-    animation(runRight, 100, 100);
+    scale(0.3);
+    animation(runRight, 2500, 2500);
   }
 
 }
@@ -79,9 +80,13 @@ function keyPressed(){
   }
 }
 
+function preload(){
+  gameMap = loadImage("gameMap/gameMap.png");
+}
+
 function gameBegin(){
   clear();
-  rect(30, 20, 55, 55);
+  image(gameMap, 0, 0, 2388, 1668);
 }
 
 
