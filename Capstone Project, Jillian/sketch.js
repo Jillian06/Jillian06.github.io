@@ -64,8 +64,9 @@ function pressStart(){
   // if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
   //   timer --;
   // }
-  textSize(60);
+  // textSize(60);
   fill(255);
+  textFont('Courier New', 60);
   stroke(0);
   strokeWeight(4);
   text('Press ENTER to Start the Game', 1350, 1660);
