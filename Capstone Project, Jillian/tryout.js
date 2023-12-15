@@ -3,6 +3,7 @@
 // 2023.12.11
 
 let gameStart;
+let nausicaa;
 // let starter = 8;
 let ifGameStart = false;
 let runFront, runFrontMask, runLeft, runLeftMask, runRight, runRightMask, runBack;
@@ -10,26 +11,46 @@ let gameMap;
 
 function setup() {
   createCanvas(2388, 1668);
+  nausicaa = new Sprite(250, 80, 120);
   gameStart = loadAni("gameStart/IMG_01.png", 21);
   loadplayerRun();
-  if(ifGameStart === true){
-    gameBegin();
-    testingBall();
-  }
+//   if(ifGameStart === true){
+//     gameBegin();
+//     testingBall();
+//   }
 }
 
 function loadplayerRun(){
-  runFront = loadAni("playerRun/IMG_runFront.png", { frameSize: [256, 256], frames: 4 });
-  runFrontMask = loadAni("playerRun/IMG_runFrontMask.png", { frameSize: [256, 256], frames: 4 });
-  runLeft = loadAni("playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
-  runLeftMask = loadAni("playerRun/IMG_runLeftMask.png", { frameSize: [256, 256], frames: 4 });
-  runRight = loadAni("playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
-  runRightMask = loadAni("playerRun/IMG_runRightMask.png", { frameSize: [256, 256], frames: 4 });
-  runBack = loadAni("playerRun/IMG_runBack.png", { frameSize: [256, 256], frames: 4 });
+  nausicaa.addAni("up", "playerRun/IMG_runFront.png", { frameSize: [256, 256], frames: 4 });
+  nausicaa.addAni("playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
+  nausicaa.addAni("playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
+//   nausicaa.addAni("playerRun/IMG_runBack.png", { frameSize: [256, 256], frames: 4 });
 }
 
 function draw() {
-  background(0);
+  clear();
+  nausicaa.debug = mouse.pressing();
+  if(kb.pressing("left")){
+    nausicaa.changeAni("playerRun/IMG_runLeft.png");
+    nausicaa.vel.x = -2;
+  }
+  else if(kb.pressing("right")){
+    nausicaa.changeAni("playerRun/IMG_runRight.png");
+    nausicaa.vel.x = 2;
+  }
+  else if(kb.pressing("up")){
+    nausicaa.changeAni("up");
+    nausicaa.y += 2;
+  }
+  else if(kb.pressing("down")){
+    nausicaa.changeAni("playerRun/IMG_runFront.png");
+    nausicaa.vel.y = -2;
+  }
+  if (kb.pressing('space')){
+    nausicaa.ani.stop();
+} else {
+    nausicaa.ani.play();
+}
   // clear();
   // pressStart();
   if(ifGameStart === false){
@@ -38,8 +59,8 @@ function draw() {
   // pressStart();
   if(ifGameStart === true){
     // image(gameMap, 0, 0);
-    playerRun();
-    testingBall();
+    // playerRun();
+    // testingBall();
   }
   // }
   // else{
@@ -130,4 +151,3 @@ function testingBall(){
 //   clear();
 //   animation(cloudAni, width/2, height/2);
 // }
-
