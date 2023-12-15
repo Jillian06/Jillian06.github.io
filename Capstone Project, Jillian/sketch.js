@@ -12,6 +12,10 @@ function setup() {
   createCanvas(2388, 1668);
   gameStart = loadAni("gameStart/IMG_01.png", 21);
   loadplayerRun();
+  if(ifGameStart === true){
+    gameBegin();
+    testingBall();
+  }
 }
 
 function loadplayerRun(){
@@ -29,10 +33,15 @@ function draw() {
   // pressStart();
   // if(ifGameStart === false){
   animation(gameStart, 1194, 834);
-  pressStart();
+  // pressStart();
+  if(ifGameStart === true){
+    image(gameMap, 0, 0);
+    playerRun();
+    testingBall();
+  }
   // }
   // else{
-  playerRun();
+  // playerRun();
   // }
 }
 
@@ -70,9 +79,9 @@ function pressStart(){
   stroke(0);
   strokeWeight(4);
   text('Press ENTER to Start the Game', 1350, 1660);
-  if(ifGameStart === true){
-    gameBegin();
-  }
+  // if(ifGameStart === true){
+  //   gameBegin();
+  // }
 }
 
 function keyPressed(){
@@ -85,11 +94,19 @@ function preload(){
   gameMap = loadImage("gameMap/gameMap.png");
 }
 
+// function gameBegin(){
+//   image(gameMap, 0, 0, 2388, 1668);
+// }
+
 function gameBegin(){
-  clear();
-  image(gameMap, 0, 0, 2388, 1668);
+  createCanvas(2388, 1668);
+  gameMap = createGraphics(gameMap, 0, 0, 2388, 1668);
 }
 
+function testingBall(){
+  fill(255);
+  circle(2000, 2000, 100);
+}
 
 
 // function draw() {
