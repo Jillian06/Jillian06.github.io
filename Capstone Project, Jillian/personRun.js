@@ -14,7 +14,10 @@ function setup() {
   nausicaa = new Sprite(250, 80, 120);
   gameStart = loadAni("gameStart/IMG_01.png", 21);
   loadplayerRun();
-  testingBall();
+//   if(ifGameStart === true){
+//     gameBegin();
+//     testingBall();
+//   }
 }
 
 function loadplayerRun(){
@@ -26,8 +29,6 @@ function loadplayerRun(){
 
 function draw() {
   clear();
-  testingBall();
-  ballClicked();
   nausicaa.debug = mouse.pressing();
   if(kb.pressing("left")){
     nausicaa.changeAni("left");
@@ -52,9 +53,9 @@ function draw() {
 }
   // clear();
   // pressStart();
-  // if(ifGameStart === false){
-  // animation(gameStart, 1194, 834);
-  // }
+  if(ifGameStart === false){
+  animation(gameStart, 1194, 834);
+  }
   // pressStart();
   if(ifGameStart === true){
     // image(gameMap, 0, 0);
@@ -127,14 +128,7 @@ function gameBegin(){
 
 function testingBall(){
   fill(255);
-  circle(200, 200, 100);
-}
-
-function ballClicked(){
-  if(keyPressed && 0 < mouseX < 300 && 0 < mouseY < 300 ){
-    fill(255, 0, 0);
-    rect(100, 100, 200, 10);
-  }
+  circle(2000, 2000, 100);
 }
 
 

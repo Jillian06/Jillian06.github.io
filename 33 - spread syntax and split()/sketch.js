@@ -39,7 +39,7 @@ function setup() {
     ["w", "white"],
     ["r", "sienna"],
     ["l", "peru"],
-    ["p", color(150, 150, 255)];
+    ["p", color(150, 150, 255)]
 
   ]);
 
