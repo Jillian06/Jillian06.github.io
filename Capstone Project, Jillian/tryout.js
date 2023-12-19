@@ -17,7 +17,7 @@ function setup() {
   // testingBall();
 }
 
-function loadplayerRun(){
+function loadplayerRun() {
   nausicaa.addAni("down", "playerRun/IMG_runFront.png", { frameSize: [256, 256], frames: 4 });
   nausicaa.addAni("left", "playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
   nausicaa.addAni("right", "playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
@@ -29,34 +29,34 @@ function draw() {
   testingBall();
   ballClicked();
   nausicaa.debug = mouse.pressing();
-  if(kb.pressing("left")){
+  if (kb.pressing("left")) {
     nausicaa.changeAni("left");
     nausicaa.x -= 2;
   }
-  else if(kb.pressing("right")){
+  else if (kb.pressing("right")) {
     nausicaa.changeAni("right");
     nausicaa.x += 2;
   }
-  else if(kb.pressing("down")){
+  else if (kb.pressing("down")) {
     nausicaa.changeAni("down");
     nausicaa.y += 2;
   }
-  else if(kb.pressing("up")){
+  else if (kb.pressing("up")) {
     nausicaa.changeAni("up");
     nausicaa.y -= 2;
   }
-  if (kb.pressing('space')){
+  if (kb.pressing('space')) {
     nausicaa.ani.stop();
-} else {
+  } else {
     nausicaa.ani.play();
-}
+  }
   // clear();
   // pressStart();
   // if(ifGameStart === false){
   // animation(gameStart, 1194, 834);
   // }
   // pressStart();
-  if(ifGameStart === true){
+  if (ifGameStart === true) {
     // image(gameMap, 0, 0);
     // playerRun();
     // testingBall();
@@ -67,31 +67,31 @@ function draw() {
   // }
 }
 
-function playerRun(){
-  if(keyIsPressed === true && keyCode === ENTER){
+function playerRun() {
+  if (keyIsPressed === true && keyCode === ENTER) {
     scale(0.3);
     animation(runFrontMask, 2500, 2500);
   }
-  if(keyIsPressed === true && keyCode === DOWN_ARROW){
+  if (keyIsPressed === true && keyCode === DOWN_ARROW) {
     scale(0.3);
     animation(runFront, 2500, 2500);
   }
-  else if(keyIsPressed === true && keyCode === UP_ARROW){
+  else if (keyIsPressed === true && keyCode === UP_ARROW) {
     scale(0.3);
     animation(runBack, 2500, 2500);
   }
-  else if(keyIsPressed === true && keyCode === LEFT_ARROW){
+  else if (keyIsPressed === true && keyCode === LEFT_ARROW) {
     scale(0.3);
     animation(runLeft, 2500, 2500);
   }
-  else if(keyIsPressed === true && keyCode === RIGHT_ARROW){
+  else if (keyIsPressed === true && keyCode === RIGHT_ARROW) {
     scale(0.3);
     animation(runRight, 2500, 2500);
   }
 
 }
 
-function pressStart(){
+function pressStart() {
   // if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
   //   timer --;
   // }
@@ -106,13 +106,13 @@ function pressStart(){
   // }
 }
 
-function keyPressed(){
-  if(ifGameStart === false && keyCode === ENTER){
+function keyPressed() {
+  if (ifGameStart === false && keyCode === ENTER) {
     ifGameStart = true;
   }
 }
 
-function preload(){
+function preload() {
   gameMap = loadImage("gameMap/gameMap.png");
 }
 
@@ -120,30 +120,29 @@ function preload(){
 //   image(gameMap, 0, 0, 2388, 1668);
 // }
 
-function gameBegin(){
+function gameBegin() {
   createCanvas(2388, 1668);
   gameMap = createGraphics(gameMap, 0, 0, 2388, 1668);
 }
 
-function testingBall(){
+function testingBall() {
   fill(255);
   circle(200, 200, 100);
 }
 
-function ballClicked(){
-  if(keyPressed && keyCode === ENTER ){
-  
-  // && 0 < mouseX < 1000 && 0 < mouseY < 1000 ){
+function ballClicked() {
+  if (keyPressed && keyCode === ENTER) {
+    // && 0 < mouseX < 1000 && 0 < mouseY < 1000 ){
     fill(255, 0, 0);
     rect(100, 100, 200, 10);
-    for(let i = 0; i < 10; i ++){
-      if(keyPressed && keyCode === SPACE){
-        fill(0);
-        rect(300, 100, 200 - i, 10);
-      }
-    }
+  }
+
+  if (keyPressed && keyCode === SHIFT) {
+    let(let i = 1; i ++)
+    rect(100, 100, 150, 10);
   }
 }
+
 
 
 // function draw() {
