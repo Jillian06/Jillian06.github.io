@@ -14,7 +14,7 @@ function setup() {
   nausicaa = new Sprite(250, 80, 120);
   gameStart = loadAni("gameStart/IMG_01.png", 21);
   loadplayerRun();
-  testingBall();
+  // testingBall();
 }
 
 function loadplayerRun(){
@@ -131,9 +131,17 @@ function testingBall(){
 }
 
 function ballClicked(){
-  if(keyPressed && 0 < mouseX < 300 && 0 < mouseY < 300 ){
+  if(keyPressed && keyCode === ENTER ){
+  
+  // && 0 < mouseX < 1000 && 0 < mouseY < 1000 ){
     fill(255, 0, 0);
     rect(100, 100, 200, 10);
+    for(let i = 0; i < 10; i ++){
+      if(keyPressed && keyCode === SPACE){
+        fill(0);
+        rect(300, 100, 200 - i, 10);
+      }
+    }
   }
 }
 
