@@ -8,6 +8,9 @@ let nausicaa;
 let ifGameStart = false;
 let runFront, runFrontMask, runLeft, runLeftMask, runRight, runRightMask, runBack;
 let gameMap;
+let x = 10;
+let ballAnimation = false;
+let ballAnimationWidth = 0;
 
 function setup() {
   createCanvas(2388, 1668);
@@ -66,6 +69,7 @@ function draw() {
   // playerRun();
   // }
 }
+
 
 function playerRun() {
   if (keyIsPressed === true && keyCode === ENTER) {
@@ -136,11 +140,29 @@ function ballClicked() {
     fill(255, 0, 0);
     rect(100, 100, 200, 10);
   }
+  if (keyIsPressed && keyCode === CONTROL && ballAnimation === false) {
+    if(ballAnimationWidth <= 0){
+      ballAnimationWidth = 200;
+    }
+    else if (ballAnimationWidth > 0){
+      ballAnimationWidth -= 5;
+    }
+    else{
+      ballAnimation = 0;
+    }
 
-  if (keyPressed && keyCode === SHIFT) {
-    let(let i = 1; i ++)
-    rect(100, 100, 150, 10);
   }
+  fill(255, 0, 0);
+  rect(100, 100, ballAnimationWidth, 10);
+
+  
+  // if(ballAnimation === true){
+    
+  //   ballAnimationWidth -= 10;
+  //   if(ballAnimationWidth < 0){
+  //     ballAnimation = false;
+  //   }
+  // }
 }
 
 
