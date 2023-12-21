@@ -4,20 +4,17 @@
 
 let gameStart;
 let nausicaa;
-// let starter = 8;
 let ifGameStart = false;
-let runFront, runFrontMask, runLeft, runLeftMask, runRight, runRightMask, runBack;
+let runFront, runLeft, runRight, runBack;
 let gameMap;
-let x = 10;
 let ballAnimation = false;
 let ballAnimationWidth = 0;
 
 function setup() {
   createCanvas(2388, 1668);
-  nausicaa = new Sprite(250, 80, 120);
   gameStart = loadAni("gameStart/IMG_01.png", 21);
+  nausicaa = new Sprite(250, 80, 120);
   loadplayerRun();
-  // testingBall();
 }
 
 function loadplayerRun() {
@@ -27,55 +24,49 @@ function loadplayerRun() {
   nausicaa.addAni("up", "playerRun/IMG_runBack.png", { frameSize: [256, 256], frames: 4 });
 }
 
+function preload() {
+  gameMap = loadImage("gameMap/gameMap.png");
+}
+
 function draw() {
   clear();
   testingBall();
   ballClicked();
-  nausicaa.debug = mouse.pressing();
-  if (kb.pressing("left")) {
-    nausicaa.changeAni("left");
-    nausicaa.x -= 2;
+  if (ifGameStart === false) {
+    animation(gameStart, 1194, 834);
   }
-  else if (kb.pressing("right")) {
-    nausicaa.changeAni("right");
-    nausicaa.x += 2;
-  }
-  else if (kb.pressing("down")) {
-    nausicaa.changeAni("down");
-    nausicaa.y += 2;
-  }
-  else if (kb.pressing("up")) {
-    nausicaa.changeAni("up");
-    nausicaa.y -= 2;
-  }
-  if (kb.pressing('space')) {
-    nausicaa.ani.stop();
-  } else {
-    nausicaa.ani.play();
-  }
-  // clear();
   // pressStart();
-  // if(ifGameStart === false){
-  // animation(gameStart, 1194, 834);
-  // }
-  // pressStart();
-  if (ifGameStart === true) {
-    // image(gameMap, 0, 0);
-    // playerRun();
-    // testingBall();
+  else if (ifGameStart === true) {
+    image(gameMap, 0, 0);
+    playerRun();
+    testingBall();
+    nausicaa.debug = mouse.pressing();
+    if (kb.pressing("left")) {
+      nausicaa.changeAni("left");
+      nausicaa.x -= 2;
+    }
+    else if (kb.pressing("right")) {
+      nausicaa.changeAni("right");
+      nausicaa.x += 2;
+    }
+    else if (kb.pressing("down")) {
+      nausicaa.changeAni("down");
+      nausicaa.y += 2;
+    }
+    else if (kb.pressing("up")) {
+      nausicaa.changeAni("up");
+      nausicaa.y -= 2;
+    }
+    if (kb.pressing('space')) {
+      nausicaa.ani.stop();
+    }
+    else {
+      nausicaa.ani.play();
+    }
   }
-  // }
-  // else{
-  // playerRun();
-  // }
 }
 
-
 function playerRun() {
-  if (keyIsPressed === true && keyCode === ENTER) {
-    scale(0.3);
-    animation(runFrontMask, 2500, 2500);
-  }
   if (keyIsPressed === true && keyCode === DOWN_ARROW) {
     scale(0.3);
     animation(runFront, 2500, 2500);
@@ -92,41 +83,23 @@ function playerRun() {
     scale(0.3);
     animation(runRight, 2500, 2500);
   }
-
 }
 
 function pressStart() {
-  // if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
-  //   timer --;
-  // }
-  // textSize(60);
   fill(255);
   textFont('Courier New', 60);
   stroke(0);
   strokeWeight(4);
   text('Press ENTER to Start the Game', 1350, 1660);
-  // if(ifGameStart === true){
-  //   gameBegin();
-  // }
+  if (ifGameStart === true) {
+    gameBegin();
+  }
 }
 
 function keyPressed() {
   if (ifGameStart === false && keyCode === ENTER) {
     ifGameStart = true;
   }
-}
-
-function preload() {
-  gameMap = loadImage("gameMap/gameMap.png");
-}
-
-// function gameBegin(){
-//   image(gameMap, 0, 0, 2388, 1668);
-// }
-
-function gameBegin() {
-  createCanvas(2388, 1668);
-  gameMap = createGraphics(gameMap, 0, 0, 2388, 1668);
 }
 
 function testingBall() {
@@ -141,48 +114,16 @@ function ballClicked() {
     rect(100, 100, 200, 10);
   }
   if (keyIsPressed && keyCode === CONTROL && ballAnimation === false) {
-    if(ballAnimationWidth <= 0){
+    if (ballAnimationWidth <= 0) {
       ballAnimationWidth = 200;
     }
-    else if (ballAnimationWidth > 0){
+    else if (ballAnimationWidth > 0) {
       ballAnimationWidth -= 5;
     }
-    else{
+    else {
       ballAnimation = 0;
     }
-
   }
   fill(255, 0, 0);
   rect(100, 100, ballAnimationWidth, 10);
-
-  
-  // if(ballAnimation === true){
-    
-  //   ballAnimationWidth -= 10;
-  //   if(ballAnimationWidth < 0){
-  //     ballAnimation = false;
-  //   }
-  // }
 }
-
-
-
-// function draw() {
-//   //background(0);
-//   animation(gameStart, 250, 80);
-//   //image(gameStart, mouseX,mouseY);
-// }
-
-
-// let cloudAni;
-
-// function setup() {
-//   createCanvas(windowWidth, windowHeight);
-//   cloudAni = loadAni('gameStart/IMG_01.png', 9);
-// }
-
-// function draw() {
-//   background(220);
-//   clear();
-//   animation(cloudAni, width/2, height/2);
-// }
