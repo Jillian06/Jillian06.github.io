@@ -26,16 +26,17 @@ function loadplayerRun() {
 
 function preload() {
   gameMap = loadImage("gameMap/gameMap.png");
+  textFont1 = loadFont('textFont/8-bitanco.ttf');
 }
 
 function draw() {
-  clear();
+  // clear();
   testingBall();
   ballClicked();
   if (ifGameStart === false) {
     animation(gameStart, 1194, 834);
+    pressStart();
   }
-  // pressStart();
   else if (ifGameStart === true) {
     image(gameMap, 0, 0);
     playerRun();
@@ -87,10 +88,10 @@ function playerRun() {
 
 function pressStart() {
   fill(255);
-  textFont('Courier New', 60);
+  textFont(textFont1, 60);
   stroke(0);
   strokeWeight(4);
-  text('Press ENTER to Start the Game', 1350, 1660);
+  text('Press ENTER to Start the Game', 1300, 1600);
   if (ifGameStart === true) {
     gameBegin();
   }
@@ -109,7 +110,6 @@ function testingBall() {
 
 function ballClicked() {
   if (keyPressed && keyCode === ENTER) {
-    // && 0 < mouseX < 1000 && 0 < mouseY < 1000 ){
     fill(255, 0, 0);
     rect(100, 100, 200, 10);
   }

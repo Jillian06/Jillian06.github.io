@@ -33,7 +33,7 @@ function draw() {
   // clear();
   // pressStart();
   if(ifGameStart === false){
-  animation(gameStart, 1194, 834);
+    animation(gameStart, 1194, 834);
   }
   // pressStart();
   if(ifGameStart === true){
