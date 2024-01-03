@@ -2,6 +2,7 @@
 // Jillian
 // 2023.12.11
 
+// setup github and VS code at home
 let gameStart;
 let nausicaa;
 let ifGameStart = false;
