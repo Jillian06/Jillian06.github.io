@@ -9,6 +9,8 @@ let idleAnimation;
 let score = 0
 let currentLevel = 0;
 
+let intro = false;
+
 const TILE_SIZE = 100;
 const GAME_BOUND = 1000;
 const PLAYER_ATTRIBUTES = {
@@ -35,12 +37,12 @@ const TILE_MAPS = [
         '......g.g......ff.',
         'fff.ffffff.fffff',
     ],
-    [   '.........x.......',
+    ['.........x.......',
         '.......ff..........0',
         '...fff...g......ffff',
         'ff....fffff.fffff',
     ],
-    [   '......x.........0',
+    ['......x.........0',
         'ddd..ff........dd',
         '....d.........d',
         '0.....g.g....f',
@@ -104,12 +106,12 @@ function preload() {
 }
 
 function loadplayerRun() {
-    cat1Right = loadAnimation('assets/Cat-1-Run.png', { frameSize: [100, 100], frames: 8});
+    cat1Right = loadAnimation('assets/Cat-1-Run.png', { frameSize: [100, 100], frames: 8 });
     // cat1.addAni("right", "assets/Cat-1-Run.png", { frameSize: [256, 256], frames: 8 });
     // nausicaa.addAni("left", "playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
     // nausicaa.addAni("right", "playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
     // nausicaa.addAni("up", "playerRun/IMG_runBack.png", { frameSize: [256, 256], frames: 4 });
-  }
+}
 
 function setup() {
     createCanvas(2560, 1440)
@@ -118,7 +120,7 @@ function setup() {
     // world.autoStep = false;
 
     playerSetUp();
-    
+
     // groundsensor for the player
     groundSensor = new Sprite(player.x, player.y + player.h / 2, player.w, 1)
     groundSensor.visible = false;
@@ -167,8 +169,8 @@ function draw() {
         text(`Current Level: ${currentLevel + 1}`, 60, 100)
 
         movement()
-    } 
-    
+    }
+
     else {
         setGamePlayVisible(false)
 
@@ -196,8 +198,22 @@ function draw() {
                 isGameOver = false;
                 reset()
             }
-        } 
-        
+        }
+
+        else if (intro) {
+            background(0)
+            fill(255)
+            textSize(40)
+            text(`game intro:`, width / 2, height / 2)
+
+            if (kb.pressed('enter')) {
+                isPlaying = false;
+                isGameOver = false;
+                intro = false;
+                reset()
+            }
+
+        }
         else {
             gameStart();
         }
@@ -246,21 +262,22 @@ function gameStart() {
     }
     else if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 770 && mouseY <= 970) {
-        background(0)
-        fill(255)
-        textSize(40)
-        text(`game intro:`, width / 2, height / 2)
+        intro = true;
+        // background(0)
+        // fill(255)
+        // textSize(40)
+        // text(`game intro:`, width / 2, height / 2)
 
-        if (kb.pressed('enter')) {
-            isPlaying = false;
-            isGameOver = false;
-            reset()
-        }
+        // if (kb.pressed('enter')) {
+        //     isPlaying = false;
+        //     isGameOver = false;
+        //     reset()
+        // }
 
     }
 }
 
-function playerSetUp(){
+function playerSetUp() {
     player = new Sprite(PLAYER_ATTRIBUTES.START_X, PLAYER_ATTRIBUTES.START_Y)
     // player.animation("running", at1Right);
     player.addAnimation('idle', idleAnimation)
@@ -269,7 +286,7 @@ function playerSetUp(){
 
 }
 
-function coinSetUp(){
+function coinSetUp() {
     coin = new Group()
     coin.w = COIN_ATTRIBUTES.COIN_WIDTH;
     coin.h = COIN_ATTRIBUTES.COIN_HEIGHT;
@@ -287,7 +304,7 @@ function coinSetUp(){
     })
 }
 
-function doorSetUp(){
+function doorSetUp() {
     door = new Group()
     door.w = 30;
     door.h = 50;
@@ -304,7 +321,7 @@ function doorSetUp(){
     })
 }
 
-function walkableGroupSetUp(){
+function walkableGroupSetUp() {
     walkable = new Group()
     walkable.layer = 1;
 
