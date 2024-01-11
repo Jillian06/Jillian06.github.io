@@ -6,16 +6,25 @@ let ground;
 // let background;
 let image;
 let idleAnimation;
-let score = 0
+let score = 0;
 let currentLevel = 0;
 
 let intro = false;
+
+let cat1Right;
+let cat1Stand;
+
+let changingBackground = false;
+let backgroundImage;
+let bgImage, bgImage1, bgImage2, bgImage3, bgImage4;
+
+let changingSkin = false;
 
 const TILE_SIZE = 100;
 const GAME_BOUND = 1000;
 const PLAYER_ATTRIBUTES = {
     START_X: 100,
-    START_Y: 40,
+    START_Y: 40 + 20,
     HEIGHT: 100,
     WIDTH: 100,
     JUMP_FORCE: 7,
@@ -31,42 +40,74 @@ const TILE_MAPS = [
         '................',
         '............0..x',
         'ffffffffff.fffff',
-    ],
+    ],//0
     [
         '.................x',
         '......g.g......ff.',
         'fff.ffffff.fffff',
-    ],
+    ],//1
     ['.........x.......',
         '.......ff..........0',
         '...fff...g......ffff',
         'ff....fffff.fffff',
-    ],
+    ],//2
     ['......x.........0',
         'ddd..ff........dd',
         '....d.........d',
         '0.....g.g....f',
         'ffffffffff.ff',
+    ],//3
+    ['......x.............0',
+        '...fff...gwww..ffff',
+        'ff......ffffff',
+        '..ff..........',
+        '....d.........d',
+        '0.....g.g....f',
+        'ffffffffff.ff',
+    ],//4
+    ['x...............',
+        '.f................',
+        '..f0...............',
+        '...fff..d.ddd.....',
+        '.............d',
+        '0.....g.g...ff',
+        'ffffffffff.ff',
+    ],//5
+    ['0...............',
+        'ff................',
+        '..f...........0...',
+        '....ff..d.ddd.....',
+        '......x.............0',
+        '...fff...gwww......ff',
+        'ff....f.ffffff',
     ],
     [
         'x...............',
         '.f................',
         '..f0...............',
         '..ffff...........',
-        '................',
+        '.......d........',
         '.........f...0.....',
-        '0.gwwdd.f..ddgd....',
-        '..fffff.f..ffff...',
+        '0..f..ddgd.....0',
+        'ff........ffffff...',
     ],
     [
-        '................',
-        '.f................',
-        '..f0...............',
-        '..ffff..x........',
-        '................',
-        '.........f...0.....',
-        '0.gwwdd.f..ddgd....',
-        '..fffff.f..ffff...',
+        '......x.............0',
+        '....ff...gwww......ffff',
+        'ff....f.ffffff',
+        '...d............',
+        '.....dd...f...0.....',
+        '0..f..ddgd....',
+        'ff........ffffff...',
+    ],
+    [
+        '......x.............000',
+        '0..fff...gwww......dddd',
+        'ff....f.ffffff',
+        '...d.0..........',
+        '.....dd...f...0.....',
+        '0..f........d..00',
+        'ff........fffffff..',
     ]
 ]
 
@@ -76,7 +117,7 @@ function preload() {
     idleAnimation = loadAnimation('./assets/2.png', './assets/3.png')
     runningAnimation = loadAnimation('./assets/4.gif')
 
-    world.gravity.y = 10
+    world.gravity.y = 10;
 
     // background = new Sprite(0, 0, 400, 400, 'n')
 
@@ -86,9 +127,13 @@ function preload() {
 
     // player.debug = true
 
-
     startScreenImage = loadImage('./assets/start_screen.jpeg')
     bgImage = loadImage('./assets/bg.jpg')
+    bgImage1 = loadImage('./assets/bg1.jpg')
+    bgImage2 = loadImage('./assets/bg2.jpg')
+    bgImage3 = loadImage('./assets/bg3.jpg')
+    bgImage4 = loadImage('./assets/bg4.jpg')
+    bgImage5 = loadImage('./assets/bg5.jpg')
     floorTile = loadImage('./assets/floor_tile.png')
     grassTile = loadImage('./assets/grass_tile.png')
     dirtTile = loadImage('./assets/dirt_tile.png')
@@ -106,7 +151,10 @@ function preload() {
 }
 
 function loadplayerRun() {
-    cat1Right = loadAnimation('assets/Cat-1-Run.png', { frameSize: [100, 100], frames: 8 });
+    cat1Right = loadAnimation('assets/Cat-1-Run.png', { frameSize: [50, 50], frames: 8 });
+    cat1Right.scale = 5.5;
+    cat1Stand = loadAnimation('assets/Cat-1-Licking 1.png', { frameSize: [50, 50], frames: 5 });
+    cat1Stand.scale = 5.5;
     // cat1.addAni("right", "assets/Cat-1-Run.png", { frameSize: [256, 256], frames: 8 });
     // nausicaa.addAni("left", "playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
     // nausicaa.addAni("right", "playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
@@ -114,20 +162,31 @@ function loadplayerRun() {
 }
 
 function setup() {
-    createCanvas(2560, 1440)
+    if (localStorage.getItem("currentLevel") === null) {
+        localStorage.setItem("currentLevel", 0);
+    }
+    else {
+        currentLevel = int(localStorage.getItem("currentLevel"));
+    }
+    // currentLevel = getItem("currentLevel");
+
+    createCanvas(2560, 1440);
+    backgroundImage = bgImage;
     // backgroundMusic.play()
     isPlaying = false;
     // world.autoStep = false;
 
+    loadplayerRun();
+
     playerSetUp();
 
     // groundsensor for the player
-    groundSensor = new Sprite(player.x, player.y + player.h / 2, player.w, 1)
+    groundSensor = new Sprite(player.x, player.y + player.h / 2, player.w, 12)
     groundSensor.visible = false;
     groundSensor.mass = 0.1
     // groundSensor.debug = true;
     let joint = new GlueJoint(player, groundSensor)
-    // joint.visible = true;
+    joint.visible = false;
 
     coinSetUp();
 
@@ -152,21 +211,21 @@ function draw() {
     // }
     if (isPlaying) {
         world.step();
-        background(bgImage)
+        background(backgroundImage)
         camera.x = player.x;
         camera.y = player.y;
         setGamePlayVisible(true)
 
         // display score
         fill(0)
-        stroke(1);
+        // stroke(1);
         textSize(60)
         text(`Score: ${score}`, 60, 180)
 
         fill(0)
-        stroke(1);
+        // stroke(1);
         textSize(60)
-        text(`Current Level: ${currentLevel + 1}`, 60, 100)
+        text(`Current Level: ${currentLevel + 1}`, 60, 100);
 
         movement()
     }
@@ -196,24 +255,90 @@ function draw() {
             if (kb.pressed('enter')) {
                 isPlaying = false;
                 isGameOver = false;
-                reset()
+                reset();
             }
         }
 
         else if (intro) {
-            background(0)
-            fill(255)
-            textSize(40)
-            text(`game intro:`, width / 2, height / 2)
+            background(102, 208, 250);
+            fill(255);
+            textSize(40);
+            text(`Game intro:
+            bjabkdsjkkjbdjbjka
+            sbkbdskjlbkjbsjkbd
+            sjkabsjk`, 400, 400);
 
-            if (kb.pressed('enter')) {
+            stroke(0);
+            strokeWeight(10);
+            fill(75, 115, 179);
+            rect(100, 100, 300, 100);
+
+            fill(0);
+            textSize(100);
+            text('Back', 138, 188)
+
+            if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
+                && mouseY >= 100 && mouseY <= 200) {
                 isPlaying = false;
                 isGameOver = false;
                 intro = false;
-                reset()
+                reset();
             }
 
         }
+
+        else if (changingBackground) {
+            background(102, 208, 250);
+
+            stroke(0);
+            strokeWeight(10);
+            fill(75, 115, 179);
+            rect(100, 100, 300, 100);
+
+            fill(0);
+            textSize(100);
+            text('Back', 138, 188)
+
+            fill(255);
+            rect(100, 300, 100, 850);
+            rect(2350, 300, 100, 850);
+
+            image(bgImage, 400, 400);
+
+            if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
+                && mouseY >= 100 && mouseY <= 200) {
+                isPlaying = false;
+                isGameOver = false;
+                changingBackground = false;
+                reset();
+            }
+        }
+
+        else if(changingSkin){
+            background(102, 208, 250);
+
+            stroke(0);
+            strokeWeight(10);
+            fill(75, 115, 179);
+            rect(100, 100, 300, 100);
+
+            fill(0);
+            textSize(100);
+            text('Back', 138, 188);
+
+            fill(255);
+            rect(100, 300, 100, 850);
+            rect(2350, 300, 100, 850);
+
+            if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
+                && mouseY >= 100 && mouseY <= 200) {
+                isPlaying = false;
+                isGameOver = false;
+                changingSkin = false;
+                reset();
+            }
+        }
+
         else {
             gameStart();
         }
@@ -254,6 +379,24 @@ function gameStart() {
     textSize(100);
     text('Game Intro', 330, 910);
 
+    stroke(0);
+    strokeWeight(10);
+    fill(75, 115, 179);
+    rect(2000, 70, 450, 100);
+
+    fill(0);
+    textSize(80);
+    text('Background', 2018, 148);
+
+    stroke(0);
+    strokeWeight(10);
+    fill(75, 115, 179);
+    rect(2000, 220, 450, 100);
+
+    fill(0);
+    textSize(80);
+    text('Skin', 2150, 300);
+
     if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
         isPlaying = true;
@@ -275,14 +418,25 @@ function gameStart() {
         // }
 
     }
+    else if (mouseIsPressed && mouseX >= 2000 && mouseX <= 2450
+        && mouseY >= 70 && mouseY <= 170) {
+        changingBackground = true;
+    }
+
+    else if(mouseIsPressed && mouseX >= 2000 && mouseX <= 2450
+        && mouseY >= 220 && mouseY <= 320){
+            changingSkin = true;
+        }
 }
 
 function playerSetUp() {
-    player = new Sprite(PLAYER_ATTRIBUTES.START_X, PLAYER_ATTRIBUTES.START_Y)
+    player = new Sprite(PLAYER_ATTRIBUTES.START_X, PLAYER_ATTRIBUTES.START_Y + 20)
     // player.animation("running", at1Right);
-    player.addAnimation('idle', idleAnimation)
-    player.addAnimation('running', runningAnimation)
-    player.rotationLock = true
+    // player.addAnimation('idle', idleAnimation)
+    player.changeAni(cat1Stand);
+    // player.changeAni(cat1Right);
+    // player.addAnimation('running', runningAnimation)
+    player.rotationLock = true;
 
 }
 
@@ -361,25 +515,29 @@ function walkableGroupSetUp() {
 function movement() {
     if (kb.pressing(LEFT_ARROW)) {
         player.vel.x = -PLAYER_ATTRIBUTES.SPEED;
-        player.ani = 'running'
-        player.mirror.x = false;
+        // player.ani = 'running'
+        player.changeAni(cat1Right);
+        player.mirror.x = true;
     } else if (kb.pressing(RIGHT_ARROW)) {
         player.vel.x = PLAYER_ATTRIBUTES.SPEED;
-        player.ani = 'running'
-        player.mirror.x = true;
+        // player.ani = 'running'
+        player.changeAni(cat1Right);
+        player.mirror.x = false;
     }
     else {
         player.vel.x = 0;
-        player.ani = 'idle'
+        // player.ani = 'idle'
+        // cat1Stand.scale = 5.5;
+        // player.changeAni(cat1Stand);
     }
-    if (kb.pressed('space') && groundSensor.colliding(walkable)) {
+    if (kb.presses('space') && groundSensor.colliding(walkable)) {
         player.vel.y = -PLAYER_ATTRIBUTES.JUMP_FORCE;
     }
 
     // create friction when the player is on grass or in water
-    if (groundSensor.colliding(grass) || groundSensor.colliding(water)) {
-        player.drag = 50;
-        player.friction = 50;
+    if (groundSensor.overlapping(grass) || groundSensor.overlapping(water)) {
+        player.drag = 10;
+        player.friction = 30;
     } else {
         player.drag = 0;
         player.friction = 0;
@@ -390,7 +548,7 @@ function movement() {
         isPlaying = false;
         isGameOver = true;
     }
-
+    storeData();
 }
 
 function nextLevel() {
@@ -426,4 +584,13 @@ function setGamePlayVisible(bool) {
     walkable.visible = bool;
     door.visible = bool;
     coin.visible = bool;
+}
+
+function storeData() {
+    if (kb.pressed('s') && kb.pressed('shift')) {
+        localStorage.setItem("currentLevel", currentLevel);
+    }
+    else if(kb.pressed("r") &&  kb.pressed('shift')){
+        localStorage.setItem("currentLevel", 0);
+    }
 }
