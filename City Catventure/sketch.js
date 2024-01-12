@@ -4,7 +4,7 @@ let hasWon = false;
 let player, floorTile, grass;
 let ground;
 // let background;
-let image;
+//let image;
 let idleAnimation;
 let score = 0;
 let currentLevel = 0;
@@ -19,6 +19,9 @@ let backgroundImage;
 let bgImage, bgImage1, bgImage2, bgImage3, bgImage4;
 
 let changingSkin = false;
+
+let currentBackground = 0;
+let ifCurrentBackground = false;
 
 const TILE_SIZE = 100;
 const GAME_BOUND = 1000;
@@ -170,6 +173,14 @@ function setup() {
     }
     // currentLevel = getItem("currentLevel");
 
+    if (localStorage.getItem("score") === null) {
+        localStorage.setItem("score", 0);
+    }
+    else {
+        currentLevel = int(localStorage.getItem("score"));
+    }
+    
+
     createCanvas(2560, 1440);
     backgroundImage = bgImage;
     // backgroundMusic.play()
@@ -237,7 +248,7 @@ function draw() {
             background(0)
             fill(255)
             textSize(40)
-            text(`You Win! Your score: ${score} Press Enter.`, width / 2, height / 2)
+            text(`You Win! Your score: ${score} Press Enter.`, width / 2 - 300, height / 2)
 
             if (kb.pressed('enter')) {
                 isPlaying = false;
@@ -250,7 +261,7 @@ function draw() {
             background(0)
             fill(255)
             textSize(40)
-            text(`Game Over. Your score: ${score} Press Enter.`, width / 2, height / 2)
+            text(`Game Over. Your score: ${score} Press Enter.`, width / 2 - 300, height / 2)
 
             if (kb.pressed('enter')) {
                 isPlaying = false;
@@ -275,6 +286,7 @@ function draw() {
 
             fill(0);
             textSize(100);
+            strokeWeight(1);
             text('Back', 138, 188)
 
             if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
@@ -297,13 +309,12 @@ function draw() {
 
             fill(0);
             textSize(100);
+            strokeWeight(1);
             text('Back', 138, 188)
 
             fill(255);
             rect(100, 300, 100, 850);
             rect(2350, 300, 100, 850);
-
-            image(bgImage, 400, 400);
 
             if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
                 && mouseY >= 100 && mouseY <= 200) {
@@ -311,6 +322,24 @@ function draw() {
                 isGameOver = false;
                 changingBackground = false;
                 reset();
+            }
+            else if(mouseIsPressed && mouseX >= 100 && mouseX <= 200
+                && mouseY >= 300 && mouseY <= 1150){
+                    currentBackground = true;
+                    currentBackground -= 1;
+                    console.log(currentBackground);
+                }
+            else if(mouseIsPressed && mouseX >= 2350 && mouseX <= 2450
+                && mouseY >= 300 && mouseY <= 1150){
+                    currentBackground = true;
+                    currentBackground += 1;
+                    console.log(currentBackground);
+                }
+            
+            if(currentBackground){
+                if(currentBackground === 1){
+                    image(bgImage, 600, 400);
+                }
             }
         }
 
@@ -324,6 +353,7 @@ function draw() {
 
             fill(0);
             textSize(100);
+            strokeWeight(1);
             text('Back', 138, 188);
 
             fill(255);
@@ -386,6 +416,7 @@ function gameStart() {
 
     fill(0);
     textSize(80);
+    strokeWeight(3);
     text('Background', 2018, 148);
 
     stroke(0);
@@ -395,6 +426,7 @@ function gameStart() {
 
     fill(0);
     textSize(80);
+    strokeWeight(3);
     text('Skin', 2150, 300);
 
     if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
@@ -571,8 +603,8 @@ function nextLevel() {
 }
 
 function reset() {
-    currentLevel = 0;
-    score = 0;
+    // currentLevel = 0;
+    // score = 0;
     player.speed = 0;
     player.x = PLAYER_ATTRIBUTES.START_X;
     player.y = PLAYER_ATTRIBUTES.START_Y;
@@ -587,10 +619,14 @@ function setGamePlayVisible(bool) {
 }
 
 function storeData() {
-    if (kb.pressed('s') && kb.pressed('shift')) {
+    print("waiting")
+    if (kb.pressing('s')&& kb.pressing('shift')) {
         localStorage.setItem("currentLevel", currentLevel);
+        localStorage.setItem("score", score);
+        print(currentLevel,score)
     }
     else if(kb.pressed("r") &&  kb.pressed('shift')){
         localStorage.setItem("currentLevel", 0);
+        localStorage.setItem("score", 0);
     }
 }
