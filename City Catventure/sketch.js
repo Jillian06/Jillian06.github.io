@@ -23,6 +23,8 @@ let changingSkin = false;
 let currentBackground = 0;
 let ifCurrentBackground = false;
 
+let overlay;
+
 const TILE_SIZE = 100;
 const GAME_BOUND = 1000;
 const PLAYER_ATTRIBUTES = {
@@ -182,6 +184,7 @@ function setup() {
     
 
     createCanvas(2560, 1440);
+    overlay = createGraphics(2560, 1440);
     backgroundImage = bgImage;
     // backgroundMusic.play()
     isPlaying = false;
@@ -429,11 +432,15 @@ function gameStart() {
     strokeWeight(3);
     text('Skin', 2150, 300);
 
-    if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
+    if (mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
+        overlay.fill(0);
+        overlay.rect(300, 530, 600, 200);
+        if(mouseIsPressed){
         isPlaying = true;
         isGameOver = false;
         reset();
+        }
     }
     else if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 770 && mouseY <= 970) {
