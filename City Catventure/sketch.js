@@ -12,8 +12,10 @@ let currentLevel = 0;
 
 let currentSkin = -3;
 let currentSkinPreview = -3;
+let skinBackground;
 
 let intro = false;
+let introBackground;
 
 let cat1Right;
 let cat1Stand;
@@ -24,11 +26,13 @@ let cat2Right;
 let changingBackground = false;
 let backgroundImage;
 let bgImage, bgImage1, bgImage2, bgImage3, bgImage4;
+let startScreenImage;
 
 let changingSkin = false;
 
-let currentBackground = 0;
+let currentBackground = -1;
 let ifCurrentBackground = false;
+let backgroundBackground;
 
 let overlay;
 
@@ -37,8 +41,8 @@ const GAME_BOUND = 1000;
 const PLAYER_ATTRIBUTES = {
     START_X: 100,
     START_Y: 40 + 20,
-    HEIGHT: 100,
-    WIDTH: 100,
+    HEIGHT: 60,
+    WIDTH: 60,
     JUMP_FORCE: 7,
     SPEED: 8
 }
@@ -47,7 +51,79 @@ const COIN_ATTRIBUTES = {
     COIN_HEIGHT: 10,
 }
 
+function generateTileMap(numberOfRows) {
+    const numberOfColumns = 16;
+    const tileMap = new Array(numberOfRows)
+                        .fill(null)
+                        .map(_ => new Array(numberOfColumns).fill(null));
+                            
+    tileMap[0] = new Array(numberOfColumns).fill('.');
+    const randomIndex = Math.floor(Math.random() * numberOfColumns);
+    tileMap[0][randomIndex] = 'x';
+
+    for(let i = numberOfRows - 1; i > 0; i--) {
+        for(let j = 0; j < numberOfColumns; j++) {
+            tileMap[i][j] = generateTile(i, j, numberOfRows, numberOfColumns);
+        }
+    }
+
+    function generateTile(i, j, numberOfRows, numberOfColumns) {
+        // if(i < 0 || i >= numberOfRows || j < 0 || j >= numberOfColumns) {
+    
+        // }
+        /**
+         * rules:
+         * 1. G, D, W can only be on top of F
+         * 2. top of G, D, W can only be . or 0
+         * 3. bottom of F can only be . or 0
+         * 4. G, D, W can't be on the left or right of F
+         */
+        const states = new Set( ['f', 'g', 'd', 'w', '0', '.'])
+        if(i === numberOfRows - 1) {
+            states.delete('g');
+            states.delete('d');
+            states.delete('w');
+        }
+        if(i - 1 >= 0 && tileMap[i - 1][j] === 'f') {
+            states.delete('g');
+            states.delete('d');
+            states.delete('w');
+            states.delete('f');
+        }
+        if(i + 1 < numberOfRows && tileMap[i + 1][j] === 'f') {
+            states.delete('f');
+        } 
+        if(i + 1 < numberOfRows && tileMap[i + 1][j] !== 'f'){
+            states.delete('g');
+            states.delete('d');
+            states.delete('w'); 
+        }
+        if(i + 1 < numberOfRows && (tileMap[i + 1][j] === 'g' || tileMap[i + 1][j] === 'd' || tileMap[i + 1][j] === 'w')) {
+            states.delete('g');
+            states.delete('d');
+            states.delete('w');
+            states.delete('f');
+        }
+        if(j - 1 >= 0 && j + 1 < numberOfColumns && (tileMap[i][j - 1] === 'f' || tileMap[i][j + 1] === 'f')) {
+            states.delete('g');
+            states.delete('d');
+            states.delete('w');
+        }
+        const randomIndex = Math.floor(Math.random() * states.size);
+        return Array.from(states)[randomIndex];
+    }
+    
+    return tileMap;
+    
+}
+
+console.log(generateTileMap(4));
+        
+
+
+
 const TILE_MAPS = [
+    // generateTileMap(4), 
     [
         '................',
         '............0..x',
@@ -126,8 +202,8 @@ const TILE_MAPS = [
 
 
 function preload() {
-    idleAnimation = loadAnimation('./assets/2.png', './assets/3.png')
-    runningAnimation = loadAnimation('./assets/4.gif')
+    // idleAnimation = loadAnimation('./assets/2.png', './assets/3.png')
+    // runningAnimation = loadAnimation('./assets/4.gif')
 
     world.gravity.y = 10;
 
@@ -139,7 +215,10 @@ function preload() {
 
     // player.debug = true
 
-    startScreenImage = loadImage('./assets/start_screen.jpeg')
+    startScreenImage = loadImage('./assets/IMG_2120.jpg')
+    skinBackground = loadImage('./assets/IMG_2118.jpg')
+    backgroundBackground = loadImage('./assets/IMG_2126.jpg')
+    introBackground = loadImage('./assets/IMG_2115.jpg')
     bgImage = loadImage('./assets/bg.jpg')
     bgImage1 = loadImage('./assets/bg1.jpg')
     bgImage2 = loadImage('./assets/bg2.jpg')
@@ -169,35 +248,44 @@ function loadBackground() {
 }
 
 function loadSkin(){
-    cat1Skin = loadAnimation('assets/Cat-1-Laying.png', { frameSize: [50, 50], frames: 8});
-    cat1Skin.frameDelay = 10;
-    cat1Skin.scale = 15;
-    cat2Skin = loadAnimation('assets/Cat-2-Laying.png', { frameSize: [50, 50], frames: 8});
-    cat2Skin.frameDelay = 10;
-    cat2Skin.scale = 15;
-    cat3Skin = loadAnimation('assets/Cat-3-Laying.png', { frameSize: [50, 50], frames: 8});
-    cat3Skin.frameDelay = 10;
-    cat3Skin.scale = 15;
-    cat4Skin = loadAnimation('assets/Cat-4-Laying.png', { frameSize: [50, 50], frames: 8});
-    cat4Skin.frameDelay = 10;
-    cat4Skin.scale = 15;
-    cat5Skin = loadAnimation('assets/Cat-5-Laying.png', { frameSize: [50, 50], frames: 8});
-    cat5Skin.frameDelay = 10;
-    cat5Skin.scale = 15;
-    cat6Skin = loadAnimation('assets/Cat-6-Laying.png', { frameSize: [50, 50], frames: 8});
-    cat6Skin.frameDelay = 10;
-    cat6Skin.scale = 15;
+    cat1Skin = loadAnimation('assets/Cat-1-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat1Skin.frameDelay = 8;
+    cat1Skin.scale = 10;
+    cat2Skin = loadAnimation('assets/Cat-2-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat2Skin.frameDelay = 8;
+    cat2Skin.scale = 10;
+    cat3Skin = loadAnimation('assets/Cat-3-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat3Skin.frameDelay = 8;
+    cat3Skin.scale = 10;
+    cat4Skin = loadAnimation('assets/Cat-4-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat4Skin.frameDelay = 8;
+    cat4Skin.scale = 10;
+    cat5Skin = loadAnimation('assets/Cat-5-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat5Skin.frameDelay = 8;
+    cat5Skin.scale = 10;
+    cat6Skin = loadAnimation('assets/Cat-6-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat6Skin.frameDelay = 8;
+    cat6Skin.scale = 10;
 }
 
 function loadplayerRun() {
     cat1Right = loadAnimation('assets/Cat-1-Run.png', { frameSize: [50, 50], frames: 8 });
-    cat1Right.scale = 5.5;
-    cat1Stand = loadAnimation('assets/Cat-1-Licking 1.png', { frameSize: [50, 50], frames: 5 });
-    cat1Stand.scale = 5.5;
+    // cat1Right.scale = 5.5;
+    cat1Stand = loadAnimation('assets/Cat-1-Idle.png', { frameSize: [50, 50], frames: 10 });
+    // cat1Stand.scale = 5.5;
     cat2Right = loadAnimation('assets/Cat-2-Run.png', { frameSize: [50, 50], frames: 8 });
-    cat2Right.scale = 5.5;
-    cat2Stand = loadAnimation('assets/Cat-2-Licking 1.png', { frameSize: [50, 50], frames: 8 });
-    cat2Stand.scale = 5.5;
+    // cat2Right.scale = 5.5;
+    cat2Stand = loadAnimation('assets/Cat-2-Idle.png', { frameSize: [50, 50], frames: 10 });
+    // cat2Stand.scale = 5.5;
+    cat3Right = loadAnimation('assets/Cat-3-Run.png', { frameSize: [50, 50], frames: 8 });
+    cat3Stand = loadAnimation('assets/Cat-3-Idle.png', { frameSize: [50, 50], frames: 10 });
+    cat4Right = loadAnimation('assets/Cat-4-Run.png', { frameSize: [50, 50], frames: 8 });
+    cat4Stand = loadAnimation('assets/Cat-4-Idle.png', { frameSize: [50, 50], frames: 10 });
+    cat5Right = loadAnimation('assets/Cat-5-Run.png', { frameSize: [50, 50], frames: 8 });
+    cat5Stand = loadAnimation('assets/Cat-5-Idle.png', { frameSize: [50, 50], frames: 10 });
+    cat6Right = loadAnimation('assets/Cat-6-Run.png', { frameSize: [50, 50], frames: 8 });
+    cat6Stand = loadAnimation('assets/Cat-6-Idle.png', { frameSize: [50, 50], frames: 10 });
+
     // cat1.addAni("right", "assets/Cat-1-Run.png", { frameSize: [256, 256], frames: 8 });
     // nausicaa.addAni("left", "playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
     // nausicaa.addAni("right", "playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
@@ -222,8 +310,8 @@ function setup() {
 
 
     createCanvas(2560, 1440);
-    overlay = createGraphics(2560, 1440);
-    backgroundImage = bgImage;
+    // overlay = createGraphics(2560, 1440);
+    backgroundImage = bgImage3;
     // backgroundMusic.play()
     isPlaying = false;
     // world.autoStep = false;
@@ -306,7 +394,8 @@ function draw() {
             fill(255)
             textSize(40)
             text(`Game Over. Your score: ${score} Press Enter.`, width / 2 - 300, height / 2)
-
+            player.vel.x = 0;
+            
             if (kb.pressed('enter')) {
                 isPlaying = false;
                 isGameOver = false;
@@ -319,13 +408,34 @@ function draw() {
         }
 
         else if (intro) {
-            background(102, 208, 250);
-            fill(255);
+            image(introBackground, 0, 0, 2560, 1440);
+            fill(275, 115, 179);
             textSize(40);
             text(`Game intro:
-            bjabkdsjkkjbdjbjka
-            sbkbdskjlbkjbsjkbd
-            sjkabsjk`, 400, 400);
+On the main interface, you can click the game start, select the
+ game background, and the three function keys of character skin.
+
+Game starts:
+1. The left and right arrows control the character to move left and right, 
+the up arrow controls the character to jump, and the character will fall 
+naturally due to gravity.
+2. There are different terrains in the game. Movement under special terrains 
+will encounter greater resistance and you can explore by yourself.
+3. Game points and levels are recorded in the upper left corner of the game
+ page.
+4. You can use shift+s to save the game record on the website, and 
+shift+r to cancel the record.
+5. The difficulty of the first 10 levels of the game gradually 
+increases, and the 11th level is added as a bounty level. The
+ difficulty of the random terrain is greatly increased. Be careful of falling off the cliff at the beginning of the game.
+
+Change background and skin:
+1. Click on the left and right rectangles to change pictures or 
+animations.
+2. Click on the picture or animation of the desired background or
+ skin to change it.
+3. Press the exit key in the upper left corner to return to the
+ main page.`, 300, 200);
 
             stroke(0);
             strokeWeight(10);
@@ -354,7 +464,7 @@ function draw() {
         }
 
         else if (changingBackground) {
-            background(102, 208, 250);
+            image(backgroundBackground, 0, 0, 2560, 1440);
 
             stroke(0);
             strokeWeight(10);
@@ -378,9 +488,9 @@ function draw() {
 
             if (ifCurrentBackground) {
                 if (currentBackground === -2) {
-                    image(bgImage4, 380, 250, 1800, 1100);
+                    image(bgImage4, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
-                        && mouseY >= 250 && mouseY <= 1100) {
+                        && mouseY >= 230 && mouseY <= 1330) {
                             fill(175, 115, 179, 30);
                             rect(380, 250, 1800, 1100);
                       if(mouseIsPressed){
@@ -389,43 +499,47 @@ function draw() {
                     }
                 }
                 else if (currentBackground === -1) {
-                    image(bgImage3, 380, 250, 1800, 1100);
+                    image(bgImage3, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
-                        && mouseY >= 250 && mouseY <= 1100) {
+                        && mouseY >= 230 && mouseY <= 1330) {
                             fill(175, 115, 179, 30);
-                            rect(380, 250, 1800, 1100);
+                            rect(380, 230, 1800, 1100);
                       if(mouseIsPressed){
                         backgroundImage = bgImage3;
                       }
                     }
                 }
                 else if (currentBackground === 0) {
-                    image(bgImage, 380, 250, 1800, 1100);
+                    image(bgImage, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
-                        && mouseY >= 250 && mouseY <= 1100) {
+                        && mouseY >= 230 && mouseY <= 1330) {
                             fill(175, 115, 179, 30);
-                            rect(380, 250, 1800, 1100);
+                            rect(380, 230, 1800, 1100);
                       if(mouseIsPressed){
                         backgroundImage = bgImage;
                       }
                     }
                 }
                 else if (currentBackground === 1) {
-                    image(bgImage1, 380, 250, 1800, 1100);
+                    image(bgImage1, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
-                        && mouseY >= 250 && mouseY <= 1100) {
+                        && mouseY >= 230 && mouseY <= 1330) {
                             fill(175, 115, 179, 30);
-                            rect(380, 250, 1800, 1100);
+                            rect(380, 230, 1800, 1100);
                       if(mouseIsPressed){
                         backgroundImage = bgImage1;
                       }
                     }
                 }
                 else if (currentBackground === 2) {
-                    image(bgImage2, 380, 250, 1800, 1100);
-                    if (mouseIsPressed && mouseX >= 380 && mouseX <= 2180
-                        && mouseY >= 250 && mouseY <= 1100) {
+                    image(bgImage2, 380, 230, 1800, 1100);
+                    if (mouseX >= 380 && mouseX <= 2180
+                        && mouseY >= 230 && mouseY <= 1330) {
+                            fill(175, 115, 179, 30);
+                            rect(380, 230, 1800, 1100);
+                      if(mouseIsPressed){
                         backgroundImage = bgImage2;
+                      }
                     }
                 }
                 else if (currentBackground < -2) {
@@ -448,7 +562,7 @@ function draw() {
         }
 
         else if (changingSkin) {
-            background(102, 208, 250);
+            image(skinBackground, 0, 0, 2560, 1440);
 
             stroke(0);
             strokeWeight(10);
@@ -472,10 +586,10 @@ function draw() {
 
             if (currentSkinPreview === -3) {
                 animation(cat1Skin, 1255, 750);
-                if (mouseX >= 380 && mouseX <= 2180
-                    && mouseY >= 250 && mouseY <= 1100) {
+                if (mouseX >= 870 && mouseX <= 1670
+                    && mouseY >= 500 && mouseY <= 1000) {
                         fill(175, 115, 179, 30);
-                        rect(380, 250, 1800, 1100);
+                        rect(870, 500, 800, 500);
                   if(mouseIsPressed){
                     currentSkin = -3;
                     setSkin();
@@ -484,10 +598,10 @@ function draw() {
             }
             else if (currentSkinPreview === -2) {
                 animation(cat2Skin, 1255, 750);
-                if (mouseX >= 380 && mouseX <= 2180
-                    && mouseY >= 250 && mouseY <= 1100) {
+                if (mouseX >= 870 && mouseX <= 1670
+                    && mouseY >= 500 && mouseY <= 1000) {
                         fill(175, 115, 179, 30);
-                        rect(380, 250, 1800, 1100);
+                        rect(870, 500, 800, 500);
                   if(mouseIsPressed){
                     currentSkin = -2;
                     setSkin();
@@ -496,45 +610,49 @@ function draw() {
             }
             else if (currentSkinPreview === -1) {
                 animation(cat3Skin, 1255, 750);
-                if (mouseX >= 380 && mouseX <= 2180
-                    && mouseY >= 250 && mouseY <= 1100) {
+                if (mouseX >= 870 && mouseX <= 1670
+                    && mouseY >= 500 && mouseY <= 1000) {
                         fill(175, 115, 179, 30);
-                        rect(380, 250, 1800, 1100);
+                        rect(870, 500, 800, 500);
                   if(mouseIsPressed){
                     currentSkin = -1;
+                    setSkin();
                   }
                 }
             }
             else if (currentSkinPreview === 0) {
                 animation(cat4Skin, 1255, 750);
-                if (mouseX >= 380 && mouseX <= 2180
-                    && mouseY >= 250 && mouseY <= 1100) {
+                if (mouseX >= 870 && mouseX <= 1670
+                    && mouseY >= 500 && mouseY <= 1000) {
                         fill(175, 115, 179, 30);
-                        rect(380, 250, 1800, 1100);
+                        rect(870, 500, 800, 500);
                   if(mouseIsPressed){
                     currentSkin = 0;
+                    setSkin();
                   }
                 }
             }
             else if (currentSkinPreview === 1) {
                 animation(cat5Skin, 1255, 750);
-                if (mouseX >= 380 && mouseX <= 2180
-                    && mouseY >= 250 && mouseY <= 1100) {
+                if (mouseX >= 870 && mouseX <= 1670
+                    && mouseY >= 500 && mouseY <= 1000) {
                         fill(175, 115, 179, 30);
-                        rect(380, 250, 1800, 1100);
+                        rect(870, 500, 800, 500);
                   if(mouseIsPressed){
                     currentSkin = 1;
+                    setSkin();
                   }
                 }
             }
             else if (currentSkinPreview === 2) {
                 animation(cat6Skin, 1255, 750);
-                if (mouseX >= 380 && mouseX <= 2180
-                    && mouseY >= 250 && mouseY <= 1100) {
+                if (mouseX >= 870 && mouseX <= 1670
+                    && mouseY >= 500 && mouseY <= 1000) {
                         fill(175, 115, 179, 30);
-                        rect(380, 250, 1800, 1100);
+                        rect(870, 500, 800, 500);
                   if(mouseIsPressed){
                     currentSkin = 2;
+                    setSkin();
                   }
                 }
             }
@@ -544,7 +662,7 @@ function draw() {
                 strokeWeight(1);
                 text(`No more skins, 
 please swipe right.`, 830, 688);
-                currentBackground = -4;
+                currentSkinPreview = -4;
             }
             else if (currentSkinPreview > 2) {
                 fill(0);
@@ -552,7 +670,7 @@ please swipe right.`, 830, 688);
                 strokeWeight(1);
                 text(`No more skins, 
 please swipe left.`, 830, 688)
-                currentBackground = 3;
+                currentSkinPreview = 3;
             }
 
         }
@@ -612,14 +730,17 @@ function mousePressed() {
 
 function gameStart() {
     // background(startScreenImage)
-    background(75, 115, 179);
-    animation(cat2Licking, 250, 1368);
+    // background(75, 115, 179);
+    image(startScreenImage, 0, 0, 2560, 1440)
+    animation(cat2Licking, 2350, 1368);
 
-    fill(0);
+    fill(215, 115, 179, 220);
+    strokeWeight(8);
+    stroke(175, 115, 179, 320);
     textSize(200);
     // textFont(textFont1);
-    text('City', 1500, 700)
-    text('Catventure', 1200, 950)
+    text('CITY', 1500, 700)
+    text('CATVENTURE', 1100, 950)
 
 
     // if(kb.pressed('enter')) {
@@ -630,17 +751,19 @@ function gameStart() {
 
     stroke(0);
     strokeWeight(10);
-    print(mouseX, mouseY);
+    // print(mouseX, mouseY);
     if (mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
         fill(175, 115, 179, 100);
     }
     else {
-        fill(75, 115, 179);
+        stroke(175, 115, 179);
+        fill(75, 115, 179, 60);
     }
     rect(300, 530, 600, 200);
 
-    fill(0);
+    fill(175, 115, 179);
+    stroke(0);
     textSize(100);
     text('Start Game', 335, 660)
 
@@ -648,14 +771,16 @@ function gameStart() {
     strokeWeight(10);
     if (mouseX >= 300 && mouseX <= 900
         && mouseY >= 770 && mouseY <= 970) {
-        fill(175, 115, 179, 100);
-    }
-    else {
-        fill(75, 115, 179);
-    }
+            fill(175, 115, 179, 100);
+        }
+        else {
+            stroke(175, 115, 179);
+            fill(75, 115, 179, 60);
+        }
     rect(300, 770, 600, 200);
 
-    fill(0);
+    fill(175, 115, 179);
+    stroke(0);
     textSize(100);
     text('Game Intro', 330, 910);
 
@@ -663,33 +788,37 @@ function gameStart() {
     strokeWeight(10);
     if (mouseX >= 2000 && mouseX <= 2450
         && mouseY >= 70 && mouseY <= 170) {
-        fill(175, 115, 179, 100);
-    }
-    else {
-        fill(75, 115, 179);
-    }
-    rect(2000, 70, 450, 100);
+            fill(175, 115, 179, 100);
+        }
+        else {
+            stroke(175, 115, 179);
+            fill(75, 115, 179, 60);
+        }
+    rect(2000, 70, 480, 100);
 
-    fill(0);
+    fill(175, 115, 179);
+    stroke(0);
     textSize(80);
-    strokeWeight(3);
-    text('Background', 2018, 148);
+    strokeWeight(5);
+    text('Background', 2014, 148);
 
     stroke(0);
     strokeWeight(10);
     if (mouseX >= 2000 && mouseX <= 2450
         && mouseY >= 220 && mouseY <= 320) {
-        fill(175, 115, 179, 100);
-    }
-    else {
-        fill(75, 115, 179);
-    }
-    rect(2000, 220, 450, 100);
+            fill(175, 115, 179, 100);
+        }
+        else {
+            stroke(175, 115, 179);
+            fill(75, 115, 179, 60);
+        }
+    rect(2000, 220, 480, 100);
 
-    fill(0);
+    fill(175, 115, 179);
+    stroke(0);
     textSize(80);
-    strokeWeight(3);
-    text('Skin', 2150, 300);
+    strokeWeight(5);
+    text('Skin', 2155, 300);
 
     if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
@@ -697,6 +826,8 @@ function gameStart() {
         // overlay.fill(0);
         // overlay.rect(mouseX, mouseY, 300, 200);
         isPlaying = true;
+        groundSensor.x = player.x;
+        groundSensor.y = player.y + player.h / 2;
         isGameOver = false;
         reset();
     }
@@ -726,27 +857,57 @@ function gameStart() {
         && mouseY >= 220 && mouseY <= 320) {
         changingSkin = true;
     }
-    image(overlay, 0, 0)
+    // image(overlay, 0, 0)
 }
 
 function playerSetUp() {
     player = new Sprite(PLAYER_ATTRIBUTES.START_X, PLAYER_ATTRIBUTES.START_Y + 20)
     // player.animation("running", at1Right);
-    // player.addAnimation('idle', idleAnimation)
+    // if(currentSkin === -3){
+    //     player.addAnimation('idle', cat1Stand)
+    //     player.addAnimation('running', cat1Right)
+    // }
+    // else if(currentSkin === -2){
+    //     player.addAnimation('idle', cat2Stand)
+    //     player.addAnimation('running', cat2Right)
+    // }
+    
     setSkin();
     // player.changeAni(cat1Right);
     // player.addAnimation('running', runningAnimation)
     player.rotationLock = true;
+    player.scale = 5.5;
+    player.width = PLAYER_ATTRIBUTES.WIDTH;
+    player.height = PLAYER_ATTRIBUTES.HEIGHT;
+    // player.debug = true;
 
 }
 
 function setSkin(){
-   if(currentSkin === -3){
-       player.changeAni(cat1Stand); 
+    if(currentSkin === -3){
+        player.addAnimation('idle', cat1Stand)
+        player.addAnimation('running', cat1Right)
     }
     else if(currentSkin === -2){
-        player.changeAni(cat2Stand); 
-     } 
+        player.addAnimation('idle', cat2Stand)
+        player.addAnimation('running', cat2Right)
+    }
+    if(currentSkin === -1){
+        player.addAnimation('idle', cat3Stand)
+        player.addAnimation('running', cat3Right)
+    }
+    else if(currentSkin === 0){
+        player.addAnimation('idle', cat4Stand)
+        player.addAnimation('running', cat4Right)
+    }
+    if(currentSkin === 1){
+        player.addAnimation('idle', cat5Stand)
+        player.addAnimation('running', cat5Right)
+    }
+    else if(currentSkin === 2){
+        player.addAnimation('idle', cat6Stand)
+        player.addAnimation('running', cat6Right)
+    }
 }
 
 function coinSetUp() {
@@ -784,9 +945,17 @@ function doorSetUp() {
     })
 }
 
+// class Walkable {
+//     constructor(walkableGroup, tileWidth, tileHeight, tile, collider, tileImage) {
+
+
+//     }
+// }
+
 function walkableGroupSetUp() {
     walkable = new Group()
     walkable.layer = 1;
+    // walkable.debug = true;
 
     floor = new walkable.Group()
     floor.w = TILE_SIZE
@@ -822,41 +991,45 @@ function walkableGroupSetUp() {
 }
 
 function movement() {
+
     if (kb.pressing(LEFT_ARROW)) {
         player.vel.x = -PLAYER_ATTRIBUTES.SPEED;
         // player.ani = 'running'
-        if(currentSkin === -3){
-            player.changeAni(cat1Right);
-        }
-        else if(currentSkin === -2){
-            player.changeAni(cat2Right);
-        }
+        // if(currentSkin === -3){
+        //     player.changeAni(cat1Right);
+            
+        // }
+        // else if(currentSkin === -2){
+        //     player.changeAni(cat2Right);
+        // }
+        player.ani = 'running'
         player.mirror.x = true;
     } else if (kb.pressing(RIGHT_ARROW)) {
         player.vel.x = PLAYER_ATTRIBUTES.SPEED;
         // player.ani = 'running'
-        if(currentSkin === -3){
-            player.changeAni(cat1Right);
-        }
-        else if(currentSkin === -2){
-            player.changeAni(cat2Right);
-        }
+        // if(currentSkin === -3){
+        //     player.changeAni(cat1Right);
+        // }
+        // else if(currentSkin === -2){
+        //     player.changeAni(cat2Right);
+        // }
+        player.ani = 'running'
         player.mirror.x = false;
     }
     else {
         player.vel.x = 0;
-        // player.ani = 'idle'
+        player.ani = 'idle'
         // cat1Stand.scale = 5.5;
         // player.changeAni(cat1Stand);
     }
-    if (kb.presses('space') && groundSensor.colliding(walkable)) {
+    if (kb.presses(UP_ARROW) && groundSensor.colliding(walkable)) {
         player.vel.y = -PLAYER_ATTRIBUTES.JUMP_FORCE;
     }
 
     // create friction when the player is on grass or in water
     if (groundSensor.overlapping(grass) || groundSensor.overlapping(water)) {
-        player.drag = 10;
-        player.friction = 30;
+        player.drag = 2;
+        player.friction = 5;
     } else {
         player.drag = 0;
         player.friction = 0;
@@ -906,7 +1079,7 @@ function setGamePlayVisible(bool) {
 }
 
 function storeData() {
-    print("waiting")
+    // print("waiting")
     if (kb.pressing('s') && kb.pressing('shift')) {
         localStorage.setItem("currentLevel", currentLevel);
         localStorage.setItem("score", score);
@@ -917,3 +1090,4 @@ function storeData() {
         localStorage.setItem("score", 0);
     }
 }
+
