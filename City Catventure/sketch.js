@@ -1,6 +1,13 @@
 let isPlaying = false;
 let isGameOver = false;
 
+let notPlaying = true;
+
+let textFont1;
+let isPause = false;
+
+let pauseBotton;
+
 let hasWon = false;
 let player, floorTile, grass;
 let ground;
@@ -54,22 +61,22 @@ const COIN_ATTRIBUTES = {
 function generateTileMap(numberOfRows) {
     const numberOfColumns = 16;
     const tileMap = new Array(numberOfRows)
-                        .fill(null)
-                        .map(_ => new Array(numberOfColumns).fill(null));
-                            
+        .fill(null)
+        .map(_ => new Array(numberOfColumns).fill(null));
+
     tileMap[0] = new Array(numberOfColumns).fill('.');
     const randomIndex = Math.floor(Math.random() * numberOfColumns);
     tileMap[0][randomIndex] = 'x';
 
-    for(let i = numberOfRows - 1; i > 0; i--) {
-        for(let j = 0; j < numberOfColumns; j++) {
+    for (let i = numberOfRows - 1; i > 0; i--) {
+        for (let j = 0; j < numberOfColumns; j++) {
             tileMap[i][j] = generateTile(i, j, numberOfRows, numberOfColumns);
         }
     }
 
     function generateTile(i, j, numberOfRows, numberOfColumns) {
         // if(i < 0 || i >= numberOfRows || j < 0 || j >= numberOfColumns) {
-    
+
         // }
         /**
          * rules:
@@ -78,33 +85,33 @@ function generateTileMap(numberOfRows) {
          * 3. bottom of F can only be . or 0
          * 4. G, D, W can't be on the left or right of F
          */
-        const states = new Set( ['f', 'g', 'd', 'w', '0', '.'])
-        if(i === numberOfRows - 1) {
+        const states = new Set(['f', 'g', 'd', 'w', '0', '.'])
+        if (i === numberOfRows - 1) {
             states.delete('g');
             states.delete('d');
             states.delete('w');
         }
-        if(i - 1 >= 0 && tileMap[i - 1][j] === 'f') {
-            states.delete('g');
-            states.delete('d');
-            states.delete('w');
-            states.delete('f');
-        }
-        if(i + 1 < numberOfRows && tileMap[i + 1][j] === 'f') {
-            states.delete('f');
-        } 
-        if(i + 1 < numberOfRows && tileMap[i + 1][j] !== 'f'){
-            states.delete('g');
-            states.delete('d');
-            states.delete('w'); 
-        }
-        if(i + 1 < numberOfRows && (tileMap[i + 1][j] === 'g' || tileMap[i + 1][j] === 'd' || tileMap[i + 1][j] === 'w')) {
+        if (i - 1 >= 0 && tileMap[i - 1][j] === 'f') {
             states.delete('g');
             states.delete('d');
             states.delete('w');
             states.delete('f');
         }
-        if(j - 1 >= 0 && j + 1 < numberOfColumns && (tileMap[i][j - 1] === 'f' || tileMap[i][j + 1] === 'f')) {
+        if (i + 1 < numberOfRows && tileMap[i + 1][j] === 'f') {
+            states.delete('f');
+        }
+        if (i + 1 < numberOfRows && tileMap[i + 1][j] !== 'f') {
+            states.delete('g');
+            states.delete('d');
+            states.delete('w');
+        }
+        if (i + 1 < numberOfRows && (tileMap[i + 1][j] === 'g' || tileMap[i + 1][j] === 'd' || tileMap[i + 1][j] === 'w')) {
+            states.delete('g');
+            states.delete('d');
+            states.delete('w');
+            states.delete('f');
+        }
+        if (j - 1 >= 0 && j + 1 < numberOfColumns && (tileMap[i][j - 1] === 'f' || tileMap[i][j + 1] === 'f')) {
             states.delete('g');
             states.delete('d');
             states.delete('w');
@@ -112,13 +119,13 @@ function generateTileMap(numberOfRows) {
         const randomIndex = Math.floor(Math.random() * states.size);
         return Array.from(states)[randomIndex];
     }
-    
+
     return tileMap;
-    
+
 }
 
 console.log(generateTileMap(4));
-        
+
 
 
 
@@ -214,7 +221,7 @@ function preload() {
 
 
     // player.debug = true
-
+    textFont1 = loadFont('assets/Ticketing.ttf');
     startScreenImage = loadImage('./assets/IMG_2120.jpg')
     skinBackground = loadImage('./assets/IMG_2118.jpg')
     backgroundBackground = loadImage('./assets/IMG_2126.jpg')
@@ -247,23 +254,23 @@ function loadBackground() {
     cat2Licking.scale = 10;
 }
 
-function loadSkin(){
-    cat1Skin = loadAnimation('assets/Cat-1-Walk.png', { frameSize: [50, 50], frames: 8});
+function loadSkin() {
+    cat1Skin = loadAnimation('assets/Cat-1-Walk.png', { frameSize: [50, 50], frames: 8 });
     cat1Skin.frameDelay = 8;
     cat1Skin.scale = 10;
-    cat2Skin = loadAnimation('assets/Cat-2-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat2Skin = loadAnimation('assets/Cat-2-Walk.png', { frameSize: [50, 50], frames: 8 });
     cat2Skin.frameDelay = 8;
     cat2Skin.scale = 10;
-    cat3Skin = loadAnimation('assets/Cat-3-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat3Skin = loadAnimation('assets/Cat-3-Walk.png', { frameSize: [50, 50], frames: 8 });
     cat3Skin.frameDelay = 8;
     cat3Skin.scale = 10;
-    cat4Skin = loadAnimation('assets/Cat-4-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat4Skin = loadAnimation('assets/Cat-4-Walk.png', { frameSize: [50, 50], frames: 8 });
     cat4Skin.frameDelay = 8;
     cat4Skin.scale = 10;
-    cat5Skin = loadAnimation('assets/Cat-5-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat5Skin = loadAnimation('assets/Cat-5-Walk.png', { frameSize: [50, 50], frames: 8 });
     cat5Skin.frameDelay = 8;
     cat5Skin.scale = 10;
-    cat6Skin = loadAnimation('assets/Cat-6-Walk.png', { frameSize: [50, 50], frames: 8});
+    cat6Skin = loadAnimation('assets/Cat-6-Walk.png', { frameSize: [50, 50], frames: 8 });
     cat6Skin.frameDelay = 8;
     cat6Skin.scale = 10;
 }
@@ -293,6 +300,8 @@ function loadplayerRun() {
 }
 
 function setup() {
+    // pauseSetup();
+    // pauseBotton.visible = false;
     if (localStorage.getItem("currentLevel") === null) {
         localStorage.setItem("currentLevel", 0);
     }
@@ -305,7 +314,7 @@ function setup() {
         localStorage.setItem("score", 0);
     }
     else {
-        currentLevel = int(localStorage.getItem("score"));
+        score = int(localStorage.getItem("score"));
     }
 
 
@@ -352,22 +361,46 @@ function draw() {
     //     player.changeAni('running')
     // }
     if (isPlaying) {
-        world.step();
-        background(backgroundImage);
-        camera.x = player.x;
-        camera.y = player.y;
-        setGamePlayVisible(true);
+        if (isPause === false) {
+            world.step();
+            background(backgroundImage);
+            camera.x = player.x;
+            camera.y = player.y;
+            setGamePlayVisible(true);
 
-        // display score
-        fill(0)
-        // stroke(1);
-        textSize(60)
-        text(`Score: ${score}`, 60, 180)
+            // display score
+            // textFont(textFont1);
+            fill(175, 115, 179)
+            strokeWeight(5);
+            textSize(60)
+            text(`Score: ${score}`, 2100, 180)
 
-        fill(0)
-        // stroke(1);
-        textSize(60)
-        text(`Current Level: ${currentLevel + 1}`, 60, 100);
+            fill(175, 115, 179)
+            strokeWeight(5);
+            textSize(60)
+            text(`Current Level: ${currentLevel + 1}`, 2100, 100);
+
+            stroke(0);
+            strokeWeight(10);
+            if (mouseX >= 100 && mouseX <= 400
+                && mouseY >= 100 && mouseY <= 200) {
+                fill(175, 115, 179, 100);
+            }
+        }
+        else{
+            fill(75, 115, 179);
+            rect(100, 100, 100, 100);
+        }
+
+        else {
+            fill(75, 115, 179);
+        }
+        rect(100, 100, 300, 100);
+
+        fill(0);
+        textSize(100);
+        strokeWeight(1);
+        text('Pause', 110, 188)
 
         movement()
     }
@@ -389,13 +422,14 @@ function draw() {
             }
 
         }
+
         else if (isGameOver) {
             background(0)
             fill(255)
             textSize(40)
             text(`Game Over. Your score: ${score} Press Enter.`, width / 2 - 300, height / 2)
             player.vel.x = 0;
-            
+
             if (kb.pressed('enter')) {
                 isPlaying = false;
                 isGameOver = false;
@@ -491,55 +525,55 @@ animations.
                     image(bgImage4, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
                         && mouseY >= 230 && mouseY <= 1330) {
-                            fill(175, 115, 179, 30);
-                            rect(380, 250, 1800, 1100);
-                      if(mouseIsPressed){
-                        backgroundImage = bgImage4;
-                      }
+                        fill(175, 115, 179, 30);
+                        rect(380, 250, 1800, 1100);
+                        if (mouseIsPressed) {
+                            backgroundImage = bgImage4;
+                        }
                     }
                 }
                 else if (currentBackground === -1) {
                     image(bgImage3, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
                         && mouseY >= 230 && mouseY <= 1330) {
-                            fill(175, 115, 179, 30);
-                            rect(380, 230, 1800, 1100);
-                      if(mouseIsPressed){
-                        backgroundImage = bgImage3;
-                      }
+                        fill(175, 115, 179, 30);
+                        rect(380, 230, 1800, 1100);
+                        if (mouseIsPressed) {
+                            backgroundImage = bgImage3;
+                        }
                     }
                 }
                 else if (currentBackground === 0) {
                     image(bgImage, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
                         && mouseY >= 230 && mouseY <= 1330) {
-                            fill(175, 115, 179, 30);
-                            rect(380, 230, 1800, 1100);
-                      if(mouseIsPressed){
-                        backgroundImage = bgImage;
-                      }
+                        fill(175, 115, 179, 30);
+                        rect(380, 230, 1800, 1100);
+                        if (mouseIsPressed) {
+                            backgroundImage = bgImage;
+                        }
                     }
                 }
                 else if (currentBackground === 1) {
                     image(bgImage1, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
                         && mouseY >= 230 && mouseY <= 1330) {
-                            fill(175, 115, 179, 30);
-                            rect(380, 230, 1800, 1100);
-                      if(mouseIsPressed){
-                        backgroundImage = bgImage1;
-                      }
+                        fill(175, 115, 179, 30);
+                        rect(380, 230, 1800, 1100);
+                        if (mouseIsPressed) {
+                            backgroundImage = bgImage1;
+                        }
                     }
                 }
                 else if (currentBackground === 2) {
                     image(bgImage2, 380, 230, 1800, 1100);
                     if (mouseX >= 380 && mouseX <= 2180
                         && mouseY >= 230 && mouseY <= 1330) {
-                            fill(175, 115, 179, 30);
-                            rect(380, 230, 1800, 1100);
-                      if(mouseIsPressed){
-                        backgroundImage = bgImage2;
-                      }
+                        fill(175, 115, 179, 30);
+                        rect(380, 230, 1800, 1100);
+                        if (mouseIsPressed) {
+                            backgroundImage = bgImage2;
+                        }
                     }
                 }
                 else if (currentBackground < -2) {
@@ -588,72 +622,72 @@ animations.
                 animation(cat1Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
                     && mouseY >= 500 && mouseY <= 1000) {
-                        fill(175, 115, 179, 30);
-                        rect(870, 500, 800, 500);
-                  if(mouseIsPressed){
-                    currentSkin = -3;
-                    setSkin();
-                  }
+                    fill(175, 115, 179, 30);
+                    rect(870, 500, 800, 500);
+                    if (mouseIsPressed) {
+                        currentSkin = -3;
+                        setSkin();
+                    }
                 }
             }
             else if (currentSkinPreview === -2) {
                 animation(cat2Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
                     && mouseY >= 500 && mouseY <= 1000) {
-                        fill(175, 115, 179, 30);
-                        rect(870, 500, 800, 500);
-                  if(mouseIsPressed){
-                    currentSkin = -2;
-                    setSkin();
-                  }
+                    fill(175, 115, 179, 30);
+                    rect(870, 500, 800, 500);
+                    if (mouseIsPressed) {
+                        currentSkin = -2;
+                        setSkin();
+                    }
                 }
             }
             else if (currentSkinPreview === -1) {
                 animation(cat3Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
                     && mouseY >= 500 && mouseY <= 1000) {
-                        fill(175, 115, 179, 30);
-                        rect(870, 500, 800, 500);
-                  if(mouseIsPressed){
-                    currentSkin = -1;
-                    setSkin();
-                  }
+                    fill(175, 115, 179, 30);
+                    rect(870, 500, 800, 500);
+                    if (mouseIsPressed) {
+                        currentSkin = -1;
+                        setSkin();
+                    }
                 }
             }
             else if (currentSkinPreview === 0) {
                 animation(cat4Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
                     && mouseY >= 500 && mouseY <= 1000) {
-                        fill(175, 115, 179, 30);
-                        rect(870, 500, 800, 500);
-                  if(mouseIsPressed){
-                    currentSkin = 0;
-                    setSkin();
-                  }
+                    fill(175, 115, 179, 30);
+                    rect(870, 500, 800, 500);
+                    if (mouseIsPressed) {
+                        currentSkin = 0;
+                        setSkin();
+                    }
                 }
             }
             else if (currentSkinPreview === 1) {
                 animation(cat5Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
                     && mouseY >= 500 && mouseY <= 1000) {
-                        fill(175, 115, 179, 30);
-                        rect(870, 500, 800, 500);
-                  if(mouseIsPressed){
-                    currentSkin = 1;
-                    setSkin();
-                  }
+                    fill(175, 115, 179, 30);
+                    rect(870, 500, 800, 500);
+                    if (mouseIsPressed) {
+                        currentSkin = 1;
+                        setSkin();
+                    }
                 }
             }
             else if (currentSkinPreview === 2) {
                 animation(cat6Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
                     && mouseY >= 500 && mouseY <= 1000) {
-                        fill(175, 115, 179, 30);
-                        rect(870, 500, 800, 500);
-                  if(mouseIsPressed){
-                    currentSkin = 2;
-                    setSkin();
-                  }
+                    fill(175, 115, 179, 30);
+                    rect(870, 500, 800, 500);
+                    if (mouseIsPressed) {
+                        currentSkin = 2;
+                        setSkin();
+                    }
                 }
             }
             else if (currentSkinPreview < -3) {
@@ -675,6 +709,10 @@ please swipe left.`, 830, 688)
 
         }
 
+        // else if (isPause) {
+        //     pauseBotton.visible = true;
+        // }
+
         else {
             gameStart();
         }
@@ -682,6 +720,32 @@ please swipe left.`, 830, 688)
 }
 
 function mousePressed() {
+    if (isPlaying) {
+        if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
+            && mouseY >= 100 && mouseY <= 200) {
+            // setGamePlayVisible(false)
+            // else if(isPause){
+            // background(0)
+            // fill(255)
+            // textSize(40)
+            // text(`Game Over. Your score: ${score} Press Enter.`, width / 2 - 300, height / 2)
+            // player.vel.x = 0;
+
+            //     if (kb.pressed('enter')) {
+            //         isPlaying = false;
+            //         isGameOver = false;
+            //         hasWon = false;
+            //         intro = false;
+            //         changingBackground = false;
+            //         changingSkin = false;
+            //         reset();
+            //     }
+            // }
+            isPause = true;
+            //tiles
+            // reset();
+        }
+    }
     if (changingBackground) {
         if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
             && mouseY >= 100 && mouseY <= 200) {
@@ -689,8 +753,8 @@ function mousePressed() {
             isGameOver = false;
             changingBackground = false;
             reset();
-            }
-    
+        }
+
         else {
             if (mouseIsPressed && mouseX >= 100 && mouseX <= 200
                 && mouseY >= 300 && mouseY <= 1150) {
@@ -714,7 +778,7 @@ function mousePressed() {
             changingSkin = false;
             reset();
         }
-    
+
         else {
             if (mouseIsPressed && mouseX >= 100 && mouseX <= 200
                 && mouseY >= 300 && mouseY <= 1150) {
@@ -771,12 +835,12 @@ function gameStart() {
     strokeWeight(10);
     if (mouseX >= 300 && mouseX <= 900
         && mouseY >= 770 && mouseY <= 970) {
-            fill(175, 115, 179, 100);
-        }
-        else {
-            stroke(175, 115, 179);
-            fill(75, 115, 179, 60);
-        }
+        fill(175, 115, 179, 100);
+    }
+    else {
+        stroke(175, 115, 179);
+        fill(75, 115, 179, 60);
+    }
     rect(300, 770, 600, 200);
 
     fill(175, 115, 179);
@@ -788,12 +852,12 @@ function gameStart() {
     strokeWeight(10);
     if (mouseX >= 2000 && mouseX <= 2450
         && mouseY >= 70 && mouseY <= 170) {
-            fill(175, 115, 179, 100);
-        }
-        else {
-            stroke(175, 115, 179);
-            fill(75, 115, 179, 60);
-        }
+        fill(175, 115, 179, 100);
+    }
+    else {
+        stroke(175, 115, 179);
+        fill(75, 115, 179, 60);
+    }
     rect(2000, 70, 480, 100);
 
     fill(175, 115, 179);
@@ -806,12 +870,12 @@ function gameStart() {
     strokeWeight(10);
     if (mouseX >= 2000 && mouseX <= 2450
         && mouseY >= 220 && mouseY <= 320) {
-            fill(175, 115, 179, 100);
-        }
-        else {
-            stroke(175, 115, 179);
-            fill(75, 115, 179, 60);
-        }
+        fill(175, 115, 179, 100);
+    }
+    else {
+        stroke(175, 115, 179);
+        fill(75, 115, 179, 60);
+    }
     rect(2000, 220, 480, 100);
 
     fill(175, 115, 179);
@@ -871,7 +935,7 @@ function playerSetUp() {
     //     player.addAnimation('idle', cat2Stand)
     //     player.addAnimation('running', cat2Right)
     // }
-    
+
     setSkin();
     // player.changeAni(cat1Right);
     // player.addAnimation('running', runningAnimation)
@@ -883,28 +947,28 @@ function playerSetUp() {
 
 }
 
-function setSkin(){
-    if(currentSkin === -3){
+function setSkin() {
+    if (currentSkin === -3) {
         player.addAnimation('idle', cat1Stand)
         player.addAnimation('running', cat1Right)
     }
-    else if(currentSkin === -2){
+    else if (currentSkin === -2) {
         player.addAnimation('idle', cat2Stand)
         player.addAnimation('running', cat2Right)
     }
-    if(currentSkin === -1){
+    if (currentSkin === -1) {
         player.addAnimation('idle', cat3Stand)
         player.addAnimation('running', cat3Right)
     }
-    else if(currentSkin === 0){
+    else if (currentSkin === 0) {
         player.addAnimation('idle', cat4Stand)
         player.addAnimation('running', cat4Right)
     }
-    if(currentSkin === 1){
+    if (currentSkin === 1) {
         player.addAnimation('idle', cat5Stand)
         player.addAnimation('running', cat5Right)
     }
-    else if(currentSkin === 2){
+    else if (currentSkin === 2) {
         player.addAnimation('idle', cat6Stand)
         player.addAnimation('running', cat6Right)
     }
@@ -997,7 +1061,7 @@ function movement() {
         // player.ani = 'running'
         // if(currentSkin === -3){
         //     player.changeAni(cat1Right);
-            
+
         // }
         // else if(currentSkin === -2){
         //     player.changeAni(cat2Right);
@@ -1040,7 +1104,7 @@ function movement() {
         isPlaying = false;
         isGameOver = true;
     }
-    storeData();
+    // storeData();
 }
 
 function nextLevel() {
@@ -1068,6 +1132,13 @@ function reset() {
     player.speed = 0;
     player.x = PLAYER_ATTRIBUTES.START_X;
     player.y = PLAYER_ATTRIBUTES.START_Y;
+    tileMap.remove();
+    tileMap = new Tiles(TILE_MAPS[currentLevel],
+        TILE_SIZE,
+        TILE_SIZE,
+        TILE_SIZE - 1,
+        TILE_SIZE - 1,
+    )
 
 }
 
