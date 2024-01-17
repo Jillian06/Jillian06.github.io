@@ -380,20 +380,57 @@ function draw() {
             textSize(60)
             text(`Current Level: ${currentLevel + 1}`, 2100, 100);
 
+            // stroke(0);
+            // strokeWeight(10);
+            // if (mouseX >= 100 && mouseX <= 400
+            //     && mouseY >= 100 && mouseY <= 200) {
+            //     fill(175, 115, 179, 100);
+            // }
+            // else {
+            //     stroke(175, 115, 179);
+            //     fill(75, 115, 179, 60);
+            // }
+        }
+        else {
+            setGamePlayVisible(false);
+            image(introBackground, 0, 0, 2560, 1440);
+
+            fill(175, 115, 179, 100);
+            rect(900, 300, 700, 280);
+            rect(900, 600, 700, 280);
+            rect(900, 900, 700, 280);
+
             stroke(0);
             strokeWeight(10);
-            if (mouseX >= 100 && mouseX <= 400
-                && mouseY >= 100 && mouseY <= 200) {
-                fill(175, 115, 179, 100);
-            }
-        }
-        else{
-            fill(75, 115, 179);
-            rect(100, 100, 100, 100);
-        }
+            textSize(200);
+            fill(255, 115, 179);
+            text('Quit', 1050, 530);
+            textSize(130);
+            text(" Save", 1060, 730);
+            text("Record", 1040, 860);
+            text("Delete", 1060, 1030);
+            text("Record", 1040, 1160);
+            // fill(0);
+            // textSize(100);
+            // strokeWeight(1);
+            // text('Quit', 110, 188)
 
+        }
+        // else{
+        //     fill(75, 115, 179);
+        //     rect(100, 100, 100, 100);
+        // }
+
+        // else {
+        //     fill(75, 115, 179);
+        // }
+        if (mouseX >= 100 && mouseX <= 400
+            && mouseY >= 100 && mouseY <= 200) {
+            fill(175, 115, 179, 100);
+        }
         else {
-            fill(75, 115, 179);
+            stroke(175, 115, 179);
+            fill(75, 115, 179, 60);
         }
         rect(100, 100, 300, 100);
 
@@ -478,7 +515,7 @@ animations.
                 fill(175, 115, 179, 100);
             }
             else {
-                fill(75, 115, 179);
+                fill(75, 115, 179, 100);
             }
             rect(100, 100, 300, 100);
 
@@ -507,7 +544,7 @@ animations.
                 fill(175, 115, 179, 100);
             }
             else {
-                fill(75, 115, 179);
+                fill(75, 115, 179, 100);
             }
             rect(100, 100, 300, 100);
 
@@ -516,8 +553,23 @@ animations.
             strokeWeight(1);
             text('Back', 138, 188)
 
-            fill(255);
+            if (mouseX >= 100 && mouseX <= 200
+                && mouseY >= 300 && mouseY <= 1150) {
+                fill(175, 115, 179, 100);
+            }
+            else {
+                stroke(175, 115, 179);
+                fill(75, 115, 179, 60);
+            }
             rect(100, 300, 100, 850);
+            if (mouseX >= 2350 && mouseX <= 2450
+                && mouseY >= 300 && mouseY <= 1150) {
+                fill(175, 115, 179, 100);
+            }
+            else {
+                stroke(175, 115, 179);
+                fill(75, 115, 179, 60);
+            }
             rect(2350, 300, 100, 850);
 
             if (ifCurrentBackground) {
@@ -605,7 +657,7 @@ animations.
                 fill(175, 115, 179, 100);
             }
             else {
-                fill(75, 115, 179);
+                fill(75, 115, 179, 100);
             }
             rect(100, 100, 300, 100);
 
@@ -614,8 +666,23 @@ animations.
             strokeWeight(1);
             text('Back', 138, 188);
 
-            fill(255);
+            if (mouseX >= 100 && mouseX <= 200
+                && mouseY >= 300 && mouseY <= 1150) {
+                fill(175, 115, 179, 100);
+            }
+            else {
+                stroke(175, 115, 179);
+                fill(75, 115, 179, 60);
+            }
             rect(100, 300, 100, 850);
+            if (mouseX >= 2350 && mouseX <= 2450
+                && mouseY >= 300 && mouseY <= 1150) {
+                fill(175, 115, 179, 100);
+            }
+            else {
+                stroke(175, 115, 179);
+                fill(75, 115, 179, 60);
+            }
             rect(2350, 300, 100, 850);
 
             if (currentSkinPreview === -3) {
@@ -723,27 +790,25 @@ function mousePressed() {
     if (isPlaying) {
         if (mouseIsPressed && mouseX >= 100 && mouseX <= 400
             && mouseY >= 100 && mouseY <= 200) {
-            // setGamePlayVisible(false)
-            // else if(isPause){
-            // background(0)
-            // fill(255)
-            // textSize(40)
-            // text(`Game Over. Your score: ${score} Press Enter.`, width / 2 - 300, height / 2)
-            // player.vel.x = 0;
-
-            //     if (kb.pressed('enter')) {
-            //         isPlaying = false;
-            //         isGameOver = false;
-            //         hasWon = false;
-            //         intro = false;
-            //         changingBackground = false;
-            //         changingSkin = false;
-            //         reset();
-            //     }
-            // }
-            isPause = true;
-            //tiles
-            // reset();
+            isPause = !isPause;
+        }
+        if (isPause) {
+            if (mouseIsPressed && mouseX >= 900 && mouseX <= 1600
+                && mouseY >= 300 && mouseY <= 580) {
+                isPlaying = false;
+                // isPause = false;
+            }
+            else if (mouseIsPressed && mouseX >= 900 && mouseX <= 1600
+                && mouseY >= 600 && mouseY <= 880) {
+                localStorage.setItem("currentLevel", currentLevel);
+                localStorage.setItem("score", score);
+                print(currentLevel, score);
+            }
+            else if (mouseIsPressed && mouseX >= 900 && mouseX <= 1600
+                && mouseY >= 900 && mouseY <= 1180) {
+                localStorage.setItem("currentLevel", 0);
+                localStorage.setItem("score", 0);
+            }
         }
     }
     if (changingBackground) {
@@ -886,6 +951,7 @@ function gameStart() {
 
     if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
+        isPause = false;
         // overlay.clear();    
         // overlay.fill(0);
         // overlay.rect(mouseX, mouseY, 300, 200);
@@ -1055,7 +1121,6 @@ function walkableGroupSetUp() {
 }
 
 function movement() {
-
     if (kb.pressing(LEFT_ARROW)) {
         player.vel.x = -PLAYER_ATTRIBUTES.SPEED;
         // player.ani = 'running'
@@ -1149,16 +1214,16 @@ function setGamePlayVisible(bool) {
     coin.visible = bool;
 }
 
-function storeData() {
-    // print("waiting")
-    if (kb.pressing('s') && kb.pressing('shift')) {
-        localStorage.setItem("currentLevel", currentLevel);
-        localStorage.setItem("score", score);
-        print(currentLevel, score)
-    }
-    else if (kb.pressed("r") && kb.pressed('shift')) {
-        localStorage.setItem("currentLevel", 0);
-        localStorage.setItem("score", 0);
-    }
-}
+// function storeData() {
+//     // print("waiting")
+//     if (kb.pressing('s') && kb.pressing('shift')) {
+//         localStorage.setItem("currentLevel", currentLevel);
+//         localStorage.setItem("score", score);
+//         print(currentLevel, score);
+//     }
+//     else if (kb.pressed("r") && kb.pressed('shift')) {
+//         localStorage.setItem("currentLevel", 0);
+//         localStorage.setItem("score", 0);
+//     }
+// }
 
