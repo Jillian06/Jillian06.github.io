@@ -67,6 +67,7 @@ function generateTileMap(numberOfRows) {
     tileMap[0] = new Array(numberOfColumns).fill('.');
     const randomIndex = Math.floor(Math.random() * numberOfColumns);
     tileMap[0][randomIndex] = 'x';
+    tileMap[0][0] = 'f';
 
     for (let i = numberOfRows - 1; i > 0; i--) {
         for (let j = 0; j < numberOfColumns; j++) {
@@ -90,6 +91,7 @@ function generateTileMap(numberOfRows) {
             states.delete('g');
             states.delete('d');
             states.delete('w');
+            states.delete('0');
         }
         if (i - 1 >= 0 && tileMap[i - 1][j] === 'f') {
             states.delete('g');
@@ -130,7 +132,7 @@ console.log(generateTileMap(4));
 
 
 const TILE_MAPS = [
-    // generateTileMap(4), 
+    generateTileMap(4), 
     [
         '................',
         '............0..x',
@@ -170,7 +172,7 @@ const TILE_MAPS = [
     ],//5
     ['0...............',
         'ff................',
-        '..f...........0...',
+        '..f........0...',
         '....ff..d.ddd.....',
         '......x.............0',
         '...fff...gwww......ff',
@@ -182,8 +184,8 @@ const TILE_MAPS = [
         '..f0...............',
         '..ffff...........',
         '.......d........',
-        '.........f...0.....',
-        '0..f..ddgd.....0',
+        '.......g.f...0.....',
+        '0..f..dddd.....0',
         'ff........ffffff...',
     ],
     [
@@ -191,10 +193,11 @@ const TILE_MAPS = [
         '....ff...gwww......ffff',
         'ff....f.ffffff',
         '...d............',
-        '.....dd...f...0.....',
-        '0..f..ddgd....',
+        '.....dd.g.f...0.....',
+        '0..f..dddd....',
         'ff........ffffff...',
     ],
+    // generateTileMap(4),
     [
         '......x.............000',
         '0..fff...gwww......dddd',
@@ -321,7 +324,7 @@ function setup() {
     createCanvas(2560, 1440);
     // overlay = createGraphics(2560, 1440);
     backgroundImage = bgImage3;
-    // backgroundMusic.play()
+    backgroundMusic.play();
     isPlaying = false;
     // world.autoStep = false;
 
@@ -480,12 +483,9 @@ function draw() {
 
         else if (intro) {
             image(introBackground, 0, 0, 2560, 1440);
-            fill(275, 115, 179);
-            textSize(40);
-            text(`Game intro:
-On the main interface, you can click the game start, select the
- game background, and the three function keys of character skin.
-
+            fill(0);
+            textSize(50);
+            text(`                                                    GAME INTRO
 Game starts:
 1. The left and right arrows control the character to move left and right, 
 the up arrow controls the character to jump, and the character will fall 
@@ -498,15 +498,15 @@ will encounter greater resistance and you can explore by yourself.
 shift+r to cancel the record.
 5. The difficulty of the first 10 levels of the game gradually 
 increases, and the 11th level is added as a bounty level. The
- difficulty of the random terrain is greatly increased. Be careful of falling off the cliff at the beginning of the game.
-
+ difficulty of the random terrain is greatly increased. Be careful of falling 
+ off the cliff at the beginning of the game.
 Change background and skin:
 1. Click on the left and right rectangles to change pictures or 
 animations.
 2. Click on the picture or animation of the desired background or
  skin to change it.
 3. Press the exit key in the upper left corner to return to the
- main page.`, 300, 200);
+ main page.`, 520, 110);
 
             stroke(0);
             strokeWeight(10);
