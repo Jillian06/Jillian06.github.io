@@ -1175,5 +1175,3 @@ function setGamePlayVisible(bool) {
 }
 
 
-
-
