@@ -1,18 +1,11 @@
 let isPlaying = false;
 let isGameOver = false;
 
-let notPlaying = true;
-
-let textFont1;
 let isPause = false;
 
-let pauseBotton;
-
 let hasWon = false;
-let player, floorTile, grass;
-let ground;
-// let background;
-//let image;
+let player, floorTile, grass, ground;
+
 let idleAnimation;
 let score = 0;
 let currentLevel = 0;
@@ -24,11 +17,31 @@ let skinBackground;
 let intro = false;
 let introBackground;
 
+let cat2Licking;
+let cat1Skin;
+let cat2Skin;
+let cat3Skin;
+let cat4Skin;
+let cat5Skin;
+let cat6Skin;
+
 let cat1Right;
 let cat1Stand;
 
 let cat2Stand;
 let cat2Right;
+
+let cat3Right;
+let cat3Stand;
+
+let cat4Stand;
+let cat4Right;
+
+let cat5Right;
+let cat5Stand;
+
+let cat6Stand;
+let cat6Right;
 
 let changingBackground = false;
 let backgroundImage;
@@ -40,8 +53,6 @@ let changingSkin = false;
 let currentBackground = -1;
 let ifCurrentBackground = false;
 let backgroundBackground;
-
-let overlay;
 
 const TILE_SIZE = 100;
 const GAME_BOUND = 1000;
@@ -58,15 +69,21 @@ const COIN_ATTRIBUTES = {
     COIN_HEIGHT: 10,
 }
 
+// Automatically generate maps
 function generateTileMap(numberOfRows) {
+    // Design an array with 16 columns filled with nulls.
     const numberOfColumns = 16;
     const tileMap = new Array(numberOfRows)
         .fill(null)
         .map(_ => new Array(numberOfColumns).fill(null));
-
+        
+    // First place nothing, then place a random door and a platform at the player's starting point.
     tileMap[0] = new Array(numberOfColumns).fill('.');
     const randomIndex = Math.floor(Math.random() * numberOfColumns);
-    tileMap[0][randomIndex] = 'x';
+    tileMap[0][16] = 'x';
+    tileMap[1][15] = 'f';
+    // tileMap[1][16] = 'f';
+    tileMap[2][14] = 'f';
     tileMap[0][0] = 'f';
 
     for (let i = numberOfRows - 1; i > 0; i--) {
@@ -76,9 +93,6 @@ function generateTileMap(numberOfRows) {
     }
 
     function generateTile(i, j, numberOfRows, numberOfColumns) {
-        // if(i < 0 || i >= numberOfRows || j < 0 || j >= numberOfColumns) {
-
-        // }
         /**
          * rules:
          * 1. G, D, W can only be on top of F
@@ -89,7 +103,7 @@ function generateTileMap(numberOfRows) {
         const states = new Set(['f', 'g', 'd', 'w', '0', '.'])
         if (i === numberOfRows - 1) {
             states.delete('g');
-            states.delete('d');
+            // states.delete('d');
             states.delete('w');
             states.delete('0');
         }
@@ -98,14 +112,18 @@ function generateTileMap(numberOfRows) {
             states.delete('d');
             states.delete('w');
             states.delete('f');
+            // states.delete('0');
         }
         if (i + 1 < numberOfRows && tileMap[i + 1][j] === 'f') {
             states.delete('f');
+            states.delete('d');
+            // states.delete('0');
         }
         if (i + 1 < numberOfRows && tileMap[i + 1][j] !== 'f') {
             states.delete('g');
             states.delete('d');
             states.delete('w');
+            // states.delete('0');
         }
         if (i + 1 < numberOfRows && (tileMap[i + 1][j] === 'g' || tileMap[i + 1][j] === 'd' || tileMap[i + 1][j] === 'w')) {
             states.delete('g');
@@ -120,64 +138,72 @@ function generateTileMap(numberOfRows) {
         }
         const randomIndex = Math.floor(Math.random() * states.size);
         return Array.from(states)[randomIndex];
+        // Converts the states collection to array and returns the element
     }
 
     return tileMap;
-
 }
-
 console.log(generateTileMap(4));
 
-
-
-
+// map:
+// .:empty
+// 0: gold coins
+// x: door
+// f: ground
+// d: land
+// g: grass
+// w: water
 const TILE_MAPS = [
-    generateTileMap(4), 
     [
         '................',
         '............0..x',
         'ffffffffff.fffff',
-    ],//0
+    ],//0 level 1
     [
         '.................x',
         '......g.g......ff.',
-        'fff.ffffff.fffff',
-    ],//1
-    ['.........x.......',
-        '.......ff..........0',
-        '...fff...g......ffff',
-        'ff....fffff.fffff',
-    ],//2
-    ['......x.........0',
-        'ddd..ff........dd',
-        '....d.........d',
-        '0.....g.g....f',
+        'fff.ffffff.ffff',
+    ],//1 leve 2
+    ['.......x.......',
+        'ff.....ffff.......',
+        '..f..........ff....0',
+        '...f.0wwgw.......ffff',
+        '....fffffff.ffff',
+    ],//2 level 3
+    ['........x....',
+        'dd....ffffff....0',
+        '..d...........ddd',
+        '.....g0g.....f',
+        '...fffffff.ff',
+    ],//3 level 4
+    ['......x............',
+        '....ff......',
+        'ff......g.',
+        '..ff...fff.0',
+        '....dd.....d.',
+        '0gg.....g....f',
         'ffffffffff.ff',
-    ],//3
-    ['......x.............0',
-        '...fff...gwww..ffff',
-        'ff......ffffff',
-        '..ff..........',
-        '....d.........d',
-        '0.....g.g....f',
-        'ffffffffff.ff',
-    ],//4
-    ['x...............',
-        '.f................',
-        '..f0...............',
-        '...fff..d.ddd.....',
-        '.............d',
-        '0.....g.g...ff',
-        'ffffffffff.ff',
-    ],//5
-    ['0...............',
-        'ff................',
-        '..f........0...',
-        '....ff..d.ddd.....',
-        '......x.............0',
-        '...fff...gwww......ff',
-        'ff....f.ffffff',
-    ],
+    ],//4 level 5
+    ['dd................',
+        '..dw0w...x...0.....',
+        '...ddd..fff..d...g0',
+        '................ddd',
+        '.g0g..g.g.....dd',
+        'dddddddddd.dd',
+    ],//5 level 6
+    ['.....0..............',
+        '....ff..wwx..00....',
+        'ff......fffffff...00w',
+        '....w.............fff',
+        '0..fff..0www...ff',
+        'ff.....fffffff',
+    ],//6 level 7
+    ['........x.....',
+        '......ffff..000..',
+        'ff..........ffff..',
+        '..ffff..ww.0......',
+        '.......fffff........',
+    ],//7 level 8
     [
         'x...............',
         '.f................',
@@ -187,44 +213,17 @@ const TILE_MAPS = [
         '.......g.f...0.....',
         '0..f..dddd.....0',
         'ff........ffffff...',
-    ],
-    [
-        '......x.............0',
-        '....ff...gwww......ffff',
-        'ff....f.ffffff',
-        '...d............',
-        '.....dd.g.f...0.....',
-        '0..f..dddd....',
-        'ff........ffffff...',
-    ],
-    // generateTileMap(4),
-    [
-        '......x.............000',
-        '0..fff...gwww......dddd',
-        'ff....f.ffffff',
-        '...d.0..........',
-        '.....dd...f...0.....',
-        '0..f........d..00',
-        'ff........fffffff..',
-    ]
+    ],//8 level 9
+    generateTileMap(4)
+    //bounty level
 ]
 
 
 
 function preload() {
-    // idleAnimation = loadAnimation('./assets/2.png', './assets/3.png')
-    // runningAnimation = loadAnimation('./assets/4.gif')
-
     world.gravity.y = 10;
 
-    // background = new Sprite(0, 0, 400, 400, 'n')
-
-    // platform = new Sprite(100, 100)
-    // platform.collider = 'k'
-
-
-    // player.debug = true
-    textFont1 = loadFont('assets/Ticketing.ttf');
+    // textFont1 = loadFont('assets/Ticketing.ttf');
     startScreenImage = loadImage('./assets/IMG_2120.jpg')
     skinBackground = loadImage('./assets/IMG_2118.jpg')
     backgroundBackground = loadImage('./assets/IMG_2126.jpg')
@@ -295,16 +294,10 @@ function loadplayerRun() {
     cat5Stand = loadAnimation('assets/Cat-5-Idle.png', { frameSize: [50, 50], frames: 10 });
     cat6Right = loadAnimation('assets/Cat-6-Run.png', { frameSize: [50, 50], frames: 8 });
     cat6Stand = loadAnimation('assets/Cat-6-Idle.png', { frameSize: [50, 50], frames: 10 });
-
-    // cat1.addAni("right", "assets/Cat-1-Run.png", { frameSize: [256, 256], frames: 8 });
-    // nausicaa.addAni("left", "playerRun/IMG_runLeft.png", { frameSize: [256, 256], frames: 4 });
-    // nausicaa.addAni("right", "playerRun/IMG_runRight.png", { frameSize: [256, 256], frames: 4 });
-    // nausicaa.addAni("up", "playerRun/IMG_runBack.png", { frameSize: [256, 256], frames: 4 });
 }
 
 function setup() {
-    // pauseSetup();
-    // pauseBotton.visible = false;
+    backgroundMusic.loop(); // Let the music play in a loop
     if (localStorage.getItem("currentLevel") === null) {
         localStorage.setItem("currentLevel", 0);
     }
@@ -320,11 +313,12 @@ function setup() {
         score = int(localStorage.getItem("score"));
     }
 
+    // Check if currentLevel and score exist, set to 0 if not present.
+
 
     createCanvas(2560, 1440);
-    // overlay = createGraphics(2560, 1440);
     backgroundImage = bgImage3;
-    backgroundMusic.play();
+
     isPlaying = false;
     // world.autoStep = false;
 
@@ -341,6 +335,7 @@ function setup() {
     // groundSensor.debug = true;
     let joint = new GlueJoint(player, groundSensor)
     joint.visible = false;
+    // Link groundSensor and player
 
     coinSetUp();
 
@@ -358,11 +353,6 @@ function setup() {
 
 function draw() {
     clear()
-    // player.changeAni('idle')
-
-    // if(kb.pressing('up')) {
-    //     player.changeAni('running')
-    // }
     if (isPlaying) {
         if (isPause === false) {
             world.step();
@@ -372,29 +362,18 @@ function draw() {
             setGamePlayVisible(true);
 
             // display score
-            // textFont(textFont1);
             fill(175, 115, 179)
             strokeWeight(5);
             textSize(60)
-            text(`Score: ${score}`, 2100, 180)
+            text(`Score: ${score}`, 2080, 180)
 
+            // display level
             fill(175, 115, 179)
             strokeWeight(5);
             textSize(60)
-            text(`Current Level: ${currentLevel + 1}`, 2100, 100);
-
-            // stroke(0);
-            // strokeWeight(10);
-            // if (mouseX >= 100 && mouseX <= 400
-            //     && mouseY >= 100 && mouseY <= 200) {
-            //     fill(175, 115, 179, 100);
-            // }
-            // else {
-            //     stroke(175, 115, 179);
-            //     fill(75, 115, 179, 60);
-            // }
+            text(`Current Level: ${currentLevel + 1}`, 2080, 100);
         }
-        else {
+        else { // not playing, at pause page
             setGamePlayVisible(false);
             image(introBackground, 0, 0, 2560, 1440);
 
@@ -413,20 +392,7 @@ function draw() {
             text("Record", 1040, 860);
             text("Delete", 1060, 1030);
             text("Record", 1040, 1160);
-            // fill(0);
-            // textSize(100);
-            // strokeWeight(1);
-            // text('Quit', 110, 188)
-
         }
-        // else{
-        //     fill(75, 115, 179);
-        //     rect(100, 100, 100, 100);
-        // }
-
-        // else {
-        //     fill(75, 115, 179);
-        // }
         if (mouseX >= 100 && mouseX <= 400
             && mouseY >= 100 && mouseY <= 200) {
             fill(175, 115, 179, 100);
@@ -440,13 +406,13 @@ function draw() {
         fill(0);
         textSize(100);
         strokeWeight(1);
-        text('Pause', 110, 188)
+        text('Pause', 110, 188);
 
-        movement()
+        movement();
     }
 
-    else {
-        setGamePlayVisible(false)
+    else { // not playing, in special situations
+        setGamePlayVisible(false);
 
         if (hasWon) {
             background(0)
@@ -481,11 +447,37 @@ function draw() {
             }
         }
 
+        /**
+         * Beta Testing:
+         * 
+         * My mom helped me test my project, and she has hardly played any games before. 
+         * Her first question was about how to control the character. Additionally, she 
+         * found it difficult to jump and walk on both grass and water, so I adjusted the 
+         * parameters and included explanations for these in the tutorial. She was also 
+         * curious about the number of levels while playing, so I added that information as well.
+         * 
+         * She was a bit confused about how to change the skin (originally, my rectangular buttons 
+         * were two white bars), so I changed all buttons to more distinct colors. Moreover, when 
+         * you enter the button area, the button changes color, and I added this information to the 
+         * tutorial.
+         * 
+         * I also spent a considerable amount of time testing and researching issues where the player 
+         * couldn't jump to the next level and the breathing animation for the stationary cat wasn't 
+         * working. I made corresponding modifications to address these issues.
+         * 
+         * In the classroom, I asked everyone who played my game, and they all provided me with really 
+         * positive feedback. The only minor issue was that the background music would stop after 
+         * playing one loop. Therefore, to address this, I replaced the backgroundMusic.play() in the 
+         * setup function. After a little research, I modified it to backgroundMusic.loop() to make the 
+         * music continuously loop.
+         * 
+         */
+
         else if (intro) {
             image(introBackground, 0, 0, 2560, 1440);
             fill(0);
-            textSize(50);
-            text(`                                                    GAME INTRO
+            textSize(46);
+            text(`***Thank you for playing***      GAME INTRO       ***Hope you enjoy***
 Game starts:
 1. The left and right arrows control the character to move left and right, 
 the up arrow controls the character to jump, and the character will fall 
@@ -494,10 +486,11 @@ naturally due to gravity.
 will encounter greater resistance and you can explore by yourself.
 3. Game points and levels are recorded in the upper left corner of the game
  page.
-4. You can use shift+s to save the game record on the website, and 
-shift+r to cancel the record.
-5. The difficulty of the first 10 levels of the game gradually 
-increases, and the 11th level is added as a bounty level. The
+4. When you click the pause button during the game, you can choose to save 
+the record or delete the record, so that you can save the previous progress 
+or start over when you refresh the website next time.
+5. The difficulty of the first 9 levels of the game gradually 
+increases, and the 10th level is added as a bounty level. The
  difficulty of the random terrain is greatly increased. Be careful of falling 
  off the cliff at the beginning of the game.
 Change background and skin:
@@ -553,6 +546,7 @@ animations.
             strokeWeight(1);
             text('Back', 138, 188)
 
+            // Create two large keys that slide left and right
             if (mouseX >= 100 && mouseX <= 200
                 && mouseY >= 300 && mouseY <= 1150) {
                 fill(175, 115, 179, 100);
@@ -562,6 +556,7 @@ animations.
                 fill(75, 115, 179, 60);
             }
             rect(100, 300, 100, 850);
+
             if (mouseX >= 2350 && mouseX <= 2450
                 && mouseY >= 300 && mouseY <= 1150) {
                 fill(175, 115, 179, 100);
@@ -572,6 +567,7 @@ animations.
             }
             rect(2350, 300, 100, 850);
 
+            // Each layer corresponds to a different background
             if (ifCurrentBackground) {
                 if (currentBackground === -2) {
                     image(bgImage4, 380, 230, 1800, 1100);
@@ -628,6 +624,8 @@ animations.
                         }
                     }
                 }
+
+                // When there is no more background when swiping to the far left or right
                 else if (currentBackground < -2) {
                     fill(0);
                     textSize(100);
@@ -675,6 +673,7 @@ animations.
                 fill(75, 115, 179, 60);
             }
             rect(100, 300, 100, 850);
+
             if (mouseX >= 2350 && mouseX <= 2450
                 && mouseY >= 300 && mouseY <= 1150) {
                 fill(175, 115, 179, 100);
@@ -685,6 +684,7 @@ animations.
             }
             rect(2350, 300, 100, 850);
 
+            // Each layer corresponds to a different skin, and each skin is animated.
             if (currentSkinPreview === -3) {
                 animation(cat1Skin, 1255, 750);
                 if (mouseX >= 870 && mouseX <= 1670
@@ -776,10 +776,6 @@ please swipe left.`, 830, 688)
 
         }
 
-        // else if (isPause) {
-        //     pauseBotton.visible = true;
-        // }
-
         else {
             gameStart();
         }
@@ -798,12 +794,14 @@ function mousePressed() {
                 isPlaying = false;
                 // isPause = false;
             }
+            // Save score record
             else if (mouseIsPressed && mouseX >= 900 && mouseX <= 1600
                 && mouseY >= 600 && mouseY <= 880) {
                 localStorage.setItem("currentLevel", currentLevel);
                 localStorage.setItem("score", score);
                 print(currentLevel, score);
             }
+            // Clear History
             else if (mouseIsPressed && mouseX >= 900 && mouseX <= 1600
                 && mouseY >= 900 && mouseY <= 1180) {
                 localStorage.setItem("currentLevel", 0);
@@ -820,7 +818,7 @@ function mousePressed() {
             reset();
         }
 
-        else {
+        else { // Slide left or right
             if (mouseIsPressed && mouseX >= 100 && mouseX <= 200
                 && mouseY >= 300 && mouseY <= 1150) {
                 ifCurrentBackground = true;
@@ -844,7 +842,7 @@ function mousePressed() {
             reset();
         }
 
-        else {
+        else { // Slide left or right
             if (mouseIsPressed && mouseX >= 100 && mouseX <= 200
                 && mouseY >= 300 && mouseY <= 1150) {
                 currentSkinPreview -= 1;
@@ -867,7 +865,6 @@ function gameStart() {
     strokeWeight(8);
     stroke(175, 115, 179, 320);
     textSize(200);
-    // textFont(textFont1);
     text('CITY', 1500, 700)
     text('CATVENTURE', 1100, 950)
 
@@ -881,6 +878,8 @@ function gameStart() {
     stroke(0);
     strokeWeight(10);
     // print(mouseX, mouseY);
+
+    // When the mouse is over a specific area, the color of that area changes to indicate selection.
     if (mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
         fill(175, 115, 179, 100);
@@ -949,12 +948,12 @@ function gameStart() {
     strokeWeight(5);
     text('Skin', 2155, 300);
 
+    // Four options are set: 
+    // start the game, game introduction, change background and skin.
+
     if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 530 && mouseY <= 730) {
         isPause = false;
-        // overlay.clear();    
-        // overlay.fill(0);
-        // overlay.rect(mouseX, mouseY, 300, 200);
         isPlaying = true;
         groundSensor.x = player.x;
         groundSensor.y = player.y + player.h / 2;
@@ -965,46 +964,23 @@ function gameStart() {
     else if (mouseIsPressed && mouseX >= 300 && mouseX <= 900
         && mouseY >= 770 && mouseY <= 970) {
         intro = true;
-        // background(0)
-        // fill(255)
-        // textSize(40)
-        // text(`game intro:`, width / 2, height / 2)
-
-        // if (kb.pressed('enter')) {
-        //     isPlaying = false;
-        //     isGameOver = false;
-        //     reset()
-        // }
-
     }
     else if (mouseIsPressed && mouseX >= 2000 && mouseX <= 2450
         && mouseY >= 70 && mouseY <= 170) {
         changingBackground = true;
         ifCurrentBackground = true;
     }
-
     else if (mouseIsPressed && mouseX >= 2000 && mouseX <= 2450
         && mouseY >= 220 && mouseY <= 320) {
         changingSkin = true;
     }
-    // image(overlay, 0, 0)
 }
 
-function playerSetUp() {
+function playerSetUp() { //Create player sprite
     player = new Sprite(PLAYER_ATTRIBUTES.START_X, PLAYER_ATTRIBUTES.START_Y + 20)
-    // player.animation("running", at1Right);
-    // if(currentSkin === -3){
-    //     player.addAnimation('idle', cat1Stand)
-    //     player.addAnimation('running', cat1Right)
-    // }
-    // else if(currentSkin === -2){
-    //     player.addAnimation('idle', cat2Stand)
-    //     player.addAnimation('running', cat2Right)
-    // }
 
     setSkin();
-    // player.changeAni(cat1Right);
-    // player.addAnimation('running', runningAnimation)
+
     player.rotationLock = true;
     player.scale = 5.5;
     player.width = PLAYER_ATTRIBUTES.WIDTH;
@@ -1013,8 +989,8 @@ function playerSetUp() {
 
 }
 
-function setSkin() {
-    if (currentSkin === -3) {
+function setSkin() { //Different layers correspond to animations of different skins
+    if (currentSkin === -3) { 
         player.addAnimation('idle', cat1Stand)
         player.addAnimation('running', cat1Right)
     }
@@ -1075,77 +1051,57 @@ function doorSetUp() {
     })
 }
 
-// class Walkable {
-//     constructor(walkableGroup, tileWidth, tileHeight, tile, collider, tileImage) {
-
-
-//     }
-// }
-
-function walkableGroupSetUp() {
+function walkableGroupSetUp() { //The following are things cats can walk on:
     walkable = new Group()
     walkable.layer = 1;
     // walkable.debug = true;
 
-    floor = new walkable.Group()
-    floor.w = TILE_SIZE
-    floor.h = TILE_SIZE
-    floor.tile = 'f'
-    floor.collider = 's'
+    floor = new walkable.Group();
+    floor.w = TILE_SIZE;
+    floor.h = TILE_SIZE;
+    floor.tile = 'f';
+    floor.collider = 's'; 
     floorTile.resize(100, 100);
-    floor.image = floorTile
+    floor.image = floorTile;
 
-    water = new walkable.Group()
+    water = new walkable.Group();
     water.w = TILE_SIZE;
     water.h = TILE_SIZE;
-    water.tile = 'w'
-    water.collider = 'n'
+    water.tile = 'w';
+    water.collider = 'n'; // Accurate collision detection
     waterTile.resize(100, 100);
-    water.image = waterTile
+    water.image = waterTile;
 
-    dirt = new walkable.Group()
+    dirt = new walkable.Group();
     dirt.w = TILE_SIZE;
     dirt.h = TILE_SIZE;
-    dirt.tile = 'd'
-    dirt.collider = 's'
+    dirt.tile = 'd';
+    dirt.collider = 's';
     dirtTile.resize(100, 100);
-    dirt.image = dirtTile
+    dirt.image = dirtTile;
 
     grass = new walkable.Group()
     grass.w = TILE_SIZE;
     grass.h = TILE_SIZE;
-    grass.tile = 'g'
-    grass.collider = 'n'
+    grass.tile = 'g';
+    grass.collider = 'n'; // Accurate collision detection
     grassTile.resize(100, 100);
-    grass.image = grassTile
+    grass.image = grassTile;
+
+    // Water and grass need to be detected to achieve increased resistance
 }
 
 function movement() {
-    if (kb.pressing(LEFT_ARROW)) {
+    if (kb.pressing(LEFT_ARROW)) { // Animation of running left and right
         player.vel.x = -PLAYER_ATTRIBUTES.SPEED;
-        // player.ani = 'running'
-        // if(currentSkin === -3){
-        //     player.changeAni(cat1Right);
-
-        // }
-        // else if(currentSkin === -2){
-        //     player.changeAni(cat2Right);
-        // }
         player.ani = 'running'
         player.mirror.x = true;
     } else if (kb.pressing(RIGHT_ARROW)) {
         player.vel.x = PLAYER_ATTRIBUTES.SPEED;
-        // player.ani = 'running'
-        // if(currentSkin === -3){
-        //     player.changeAni(cat1Right);
-        // }
-        // else if(currentSkin === -2){
-        //     player.changeAni(cat2Right);
-        // }
         player.ani = 'running'
         player.mirror.x = false;
     }
-    else {
+    else { // still animation
         player.vel.x = 0;
         player.ani = 'idle'
         // cat1Stand.scale = 5.5;
@@ -1157,7 +1113,7 @@ function movement() {
 
     // create friction when the player is on grass or in water
     if (groundSensor.overlapping(grass) || groundSensor.overlapping(water)) {
-        player.drag = 2;
+        player.drag = 1;
         player.friction = 5;
     } else {
         player.drag = 0;
@@ -1172,6 +1128,7 @@ function movement() {
     // storeData();
 }
 
+// next level program
 function nextLevel() {
     if (currentLevel === TILE_MAPS.length - 1) {
         isPlaying = false;
@@ -1179,6 +1136,8 @@ function nextLevel() {
         return;
     }
     currentLevel++;
+
+    // reset
     player.speed = 0;
     player.x = PLAYER_ATTRIBUTES.START_X;
     player.y = PLAYER_ATTRIBUTES.START_Y;
@@ -1191,9 +1150,8 @@ function nextLevel() {
     )
 }
 
+// Settings that require restarting under special circumstances
 function reset() {
-    // currentLevel = 0;
-    // score = 0;
     player.speed = 0;
     player.x = PLAYER_ATTRIBUTES.START_X;
     player.y = PLAYER_ATTRIBUTES.START_Y;
@@ -1206,24 +1164,16 @@ function reset() {
     )
 
 }
+
 
 function setGamePlayVisible(bool) {
+    // If gamePlay doesn't want to be seen, none of the following should be seen.
     player.visible = bool;
     walkable.visible = bool;
     door.visible = bool;
     coin.visible = bool;
 }
 
-// function storeData() {
-//     // print("waiting")
-//     if (kb.pressing('s') && kb.pressing('shift')) {
-//         localStorage.setItem("currentLevel", currentLevel);
-//         localStorage.setItem("score", score);
-//         print(currentLevel, score);
-//     }
-//     else if (kb.pressed("r") && kb.pressed('shift')) {
-//         localStorage.setItem("currentLevel", 0);
-//         localStorage.setItem("score", 0);
-//     }
-// }
+
+
 
